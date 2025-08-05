@@ -1,4 +1,4 @@
-document.getElementById('design-form').addEventListener('submit', function (e) {
+document.getElementById('design-form').addEventListener('submit', async function (e) {
   e.preventDefault();
 
   // Get user selections
@@ -10,19 +10,46 @@ document.getElementById('design-form').addEventListener('submit', function (e) {
   let mass = 0;
   let success = { power: true, computer: true, structure: true };
 
-  // Calculate total mass
+  // Mass calculation
   mass += (structure === 'interlocking') ? 1 : 2;
   mass += (computer === 'arduino') ? 1 : 2;
   mass += (camera === 'compact') ? 1 : 2;
   mass += (power === 'battery') ? 3 : (power === 'solar') ? 2 : 1;
 
-  // Simulate system failures based on probabilities
-  if (power === 'solar' && Math.random() < 0.25) success.power = false;
-  if (power === 'fuelcell' && Math.random() < 0.5) success.power = false;
-  if (computer === 'arduino' && Math.random() < 0.5) success.computer = false;
-  if (structure === 'interlocking' && Math.random() < 0.25) success.structure = false; // Optional drop-test fail
+  // Show wheel overlay function
+  async function spinWheel(title, riskChance) {
+    const overlay = document.getElementById('wheel-overlay');
+    const wheel = document.querySelector('.wheel');
+    const titleEl = document.getElementById('wheel-title');
 
-  // Determine outcome
+    titleEl.textContent = title;
+    wheel.style.animation = 'none'; // reset animation
+    void wheel.offsetWidth; // force reflow
+    wheel.style.animation = 'spin 2s ease-out forwards';
+
+    overlay.style.display = 'flex';
+
+    return new Promise(resolve => {
+      setTimeout(() => {
+        const outcome = Math.random() > riskChance; // success if > risk
+        overlay.style.display = 'none';
+        resolve(outcome);
+      }, 2500);
+    });
+  }
+
+  // Simulate each system in sequence
+  if (power === 'solar') success.power = await spinWheel('Power System (Solar Panel)', 0.25);
+  else if (power === 'fuelcell') success.power = await spinWheel('Power System (Fuel Cell)', 0.5);
+  else await spinWheel('Power System (Battery Pack)', 0); // always succeeds
+
+  if (computer === 'arduino') success.computer = await spinWheel('Flight Computer (Arduino)', 0.5);
+  else await spinWheel('Flight Computer (Raspberry Pi)', 0); // always succeeds
+
+  if (structure === 'interlocking') success.structure = await spinWheel('Structure (Interlocking)', 0.25);
+  else await spinWheel('Structure (Screw-type)', 0); // always succeeds
+
+  // Final outcome
   let output = `<h2>Mission Outcome</h2>`;
 
   if (mass > 6) {
@@ -41,4 +68,3 @@ document.getElementById('design-form').addEventListener('submit', function (e) {
 
   document.getElementById('results').innerHTML = output;
 });
-
