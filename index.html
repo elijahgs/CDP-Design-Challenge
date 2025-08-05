@@ -1,1 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BSA CubeSat Design Challenge</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>BSA CubeSat Rapid Design Challenge</h1>
+    <form id="design-form">
+      <section>
+        <h2>Structure</h2>
+        <label><input type="radio" name="structure" value="interlocking" required /> Interlocking (1 mass unit)</label><br/>
+        <label><input type="radio" name="structure" value="screw" required /> Screw-type (2 mass units)</label>
+      </section>
+
+      <section>
+        <h2>Avionics - Computer</h2>
+        <label><input type="radio" name="computer" value="arduino" required /> Arduino (1 unit, 50% data corruption risk)</label><br/>
+        <label><input type="radio" name="computer" value="pi" required /> Raspberry Pi (2 units, reliable)</label>
+      </section>
+
+      <section>
+        <h2>Avionics - Camera</h2>
+        <label><input type="radio" name="camera" value="compact" required /> Compact Camera (1 unit, low-res)</label><br/>
+        <label><input type="radio" name="camera" value="highres" required /> High-Res Camera (2 units)</label>
+      </section>
+
+      <section>
+        <h2>Power System</h2>
+        <label><input type="radio" name="power" value="battery" required /> Battery Pack (3 units, reliable)</label><br/>
+        <label><input type="radio" name="power" value="solar" required /> Solar Panels (2 units, 25% failure risk)</label><br/>
+        <label><input type="radio" name="power" value="fuelcell" required /> Fuel Cell (1 unit, 50% failure risk)</label>
+      </section>
+
+      <button type="submit">Simulate Launch</button>
+    </form>
+
+    <div id="results"></div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
 
