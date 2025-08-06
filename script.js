@@ -40,21 +40,6 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.fill();
   }
 
-    // Labels for every 10th segment
-    ctx.fillStyle = 'black';
-    ctx.font = '12px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    for (let i = 0; i < segments; i += 10) {
-      const angle = ((i + 5) / segments) * 2 * Math.PI;
-      const x = radius + (radius * 0.7) * Math.cos(angle);
-      const y = radius + (radius * 0.7) * Math.sin(angle);
-      const label = i < successSegments ? 'Success' : 'Fail';
-      ctx.fillText(label, x, y);
-    }
-  }
-
   // Wheel spinning logic
   async function spinPieWheel(title, riskChance) {
     const overlay = document.getElementById('wheel-overlay');
