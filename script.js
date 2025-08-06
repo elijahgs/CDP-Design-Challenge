@@ -21,19 +21,24 @@ document.getElementById('design-form').addEventListener('submit', async function
     const radius = canvas.width / 2;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const segments = 100;
-    const successSegments = Math.round(segments * successRatio);
-    const failureSegments = segments - successSegments;
+    const successAngle = 2 * Math.PI * successRatio;
 
-    for (let i = 0; i < segments; i++) {
-      const angle = (i / segments) * 2 * Math.PI;
-      ctx.beginPath();
-      ctx.moveTo(radius, radius);
-      ctx.arc(radius, radius, radius, angle, angle + (2 * Math.PI / segments));
-      ctx.closePath();
-      ctx.fillStyle = i < successSegments ? '#4CAF50' : '#F44336';
-      ctx.fill();
-    }
+    // Draw success section
+    ctx.beginPath();
+    ctx.moveTo(radius, radius);
+    ctx.arc(radius, radius, radius, 0, successAngle);
+    ctx.closePath();
+    ctx.fillStyle = '#4CAF50'; // Green
+    ctx.fill();
+
+    // Draw failure section
+    ctx.beginPath();
+    ctx.moveTo(radius, radius);
+    ctx.arc(radius, radius, radius, successAngle, 2 * Math.PI);
+    ctx.closePath();
+    ctx.fillStyle = '#F44336'; // Red
+    ctx.fill();
+  }
 
     // Labels for every 10th segment
     ctx.fillStyle = 'black';
