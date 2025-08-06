@@ -9,13 +9,12 @@ document.getElementById('design-form').addEventListener('submit', async function
   let mass = 0;
   let success = { power: true, computer: true, structure: true };
 
-  // Calculate total mass
   mass += (structure === 'interlocking') ? 1 : 2;
   mass += (computer === 'arduino') ? 1 : 2;
   mass += (camera === 'compact') ? 1 : 2;
   mass += (power === 'battery') ? 3 : (power === 'solar') ? 2 : 1;
 
-  // Wheel drawing: smooth, two-section (success/fail)
+  // Draw a simple two-part pie chart: green (success) and red (fail)
   function drawWheel(successRatio) {
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
@@ -24,7 +23,7 @@ document.getElementById('design-form').addEventListener('submit', async function
 
     const successAngle = 2 * Math.PI * successRatio;
 
-    // Success arc (green)
+    // Draw success
     ctx.beginPath();
     ctx.moveTo(radius, radius);
     ctx.arc(radius, radius, radius, 0, successAngle);
@@ -32,7 +31,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.fillStyle = '#4CAF50';
     ctx.fill();
 
-    // Failure arc (red)
+    // Draw failure
     ctx.beginPath();
     ctx.moveTo(radius, radius);
     ctx.arc(radius, radius, radius, successAngle, 2 * Math.PI);
@@ -41,23 +40,31 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.fill();
   }
 
-  // Spin the wheel and calculate outcome
-  async function spinPieWheel(title, riskChance) {
+  // Spin the wheel toward a predetermined outcome
+  async function spinWheelForOutcome(title, riskChance) {
     const overlay = document.getElementById('wheel-overlay');
     const titleEl = document.getElementById('wheel-title');
     const canvas = document.getElementById('wheel-canvas');
     const resultLabel = document.getElementById('wheel-result-label');
 
     resultLabel.textContent = '';
-    const successRatio = 1 - riskChance;
-    drawWheel(successRatio);
-
     titleEl.textContent = title;
     overlay.style.display = 'flex';
 
-    const spins = Math.floor(Math.random() * 3) + 3;
-    const finalAngle = Math.random() * 360;
-    const totalRotation = (spins * 360) + finalAngle;
+    // Determine outcome BEFORE spinning
+    const isSuccess = Math.random() > riskChance;
+    const successRatio = 1 - riskChance;
+    drawWheel(successRatio);
+
+    // Calculate target angle
+    const pointerOffset = -90; // top of the wheel
+    const minAngle = isSuccess ? 0 : 360 * successRatio;
+    const maxAngle = isSuccess ? 360 * successRatio : 360;
+    const targetAngle = Math.random() * (maxAngle - minAngle) + minAngle;
+
+    // Spin a lot: 6–9 full rotations + final pointer alignment
+    const fullRotations = Math.floor(Math.random() * 4) + 6;
+    const totalRotation = fullRotations * 360 + targetAngle;
 
     canvas.style.transform = `rotate(0deg)`;
     void canvas.offsetWidth;
@@ -65,39 +72,28 @@ document.getElementById('design-form').addEventListener('submit', async function
 
     return new Promise(resolve => {
       setTimeout(() => {
-      // Final pointer angle, normalized to 0–360 degrees
-      const normalized = (totalRotation % 360 + 360) % 360;
-
-      // The canvas starts at 3 o’clock (0°), so pointer (12 o’clock) is at -90°
-      const pointerAngle = (normalized + 90) % 360;
-
-      // Calculate outcome: pointer lands in green arc (success)
-      const successThreshold = 360 * successRatio;
-      const outcome = pointerAngle < successThreshold;
-
-        resultLabel.textContent = outcome ? '✔️ Success!' : '❌ Failure';
-        resultLabel.style.color = outcome ? '#4CAF50' : '#F44336';
-
+        resultLabel.textContent = isSuccess ? '✔️ Success!' : '❌ Failure';
+        resultLabel.style.color = isSuccess ? '#4CAF50' : '#F44336';
         setTimeout(() => {
           overlay.style.display = 'none';
-          resolve(outcome);
+          resolve(isSuccess);
         }, 1000);
-      }, 3200);
+      }, 3500);
     });
   }
 
-  // Run through subsystems one by one
-  if (power === 'solar') success.power = await spinPieWheel('Power System (Solar Panel)', 0.25);
-  else if (power === 'fuelcell') success.power = await spinPieWheel('Power System (Fuel Cell)', 0.5);
-  else await spinPieWheel('Power System (Battery Pack)', 0);
+  // Simulate each subsystem using pathway 1 logic
+  if (power === 'solar') success.power = await spinWheelForOutcome('Power System (Solar Panel)', 0.25);
+  else if (power === 'fuelcell') success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
+  else await spinWheelForOutcome('Power System (Battery Pack)', 0);
 
-  if (computer === 'arduino') success.computer = await spinPieWheel('Flight Computer (Arduino)', 0.5);
-  else await spinPieWheel('Flight Computer (Raspberry Pi)', 0);
+  if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
+  else await spinWheelForOutcome('Flight Computer (Raspberry Pi)', 0);
 
-  if (structure === 'interlocking') success.structure = await spinPieWheel('Structure (Interlocking)', 0.25);
-  else await spinPieWheel('Structure (Screw-type)', 0);
+  if (structure === 'interlocking') success.structure = await spinWheelForOutcome('Structure (Interlocking)', 0.25);
+  else await spinWheelForOutcome('Structure (Screw-type)', 0);
 
-  // Final result display
+  // Final result summary
   let output = `<h2>Mission Outcome</h2>`;
 
   if (mass > 6) {
