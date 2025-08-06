@@ -1,7 +1,6 @@
 document.getElementById('design-form').addEventListener('submit', async function (e) {
   e.preventDefault();
 
-  // Get user selections
   const structure = document.querySelector('input[name="structure"]:checked').value;
   const computer = document.querySelector('input[name="computer"]:checked').value;
   const camera = document.querySelector('input[name="camera"]:checked').value;
@@ -10,44 +9,72 @@ document.getElementById('design-form').addEventListener('submit', async function
   let mass = 0;
   let success = { power: true, computer: true, structure: true };
 
-  // Mass calculation
   mass += (structure === 'interlocking') ? 1 : 2;
   mass += (computer === 'arduino') ? 1 : 2;
   mass += (camera === 'compact') ? 1 : 2;
   mass += (power === 'battery') ? 3 : (power === 'solar') ? 2 : 1;
 
-  // Show wheel overlay function
-  async function spinWheel(title, riskChance) {
+  // Wheel drawing function
+  function drawWheel(successRatio) {
+    const canvas = document.getElementById('wheel-canvas');
+    const ctx = canvas.getContext('2d');
+    const radius = canvas.width / 2;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const segments = 100;
+    const successSegments = Math.round(segments * successRatio);
+    const failureSegments = segments - successSegments;
+
+    for (let i = 0; i < segments; i++) {
+      const angle = (i / segments) * 2 * Math.PI;
+      ctx.beginPath();
+      ctx.moveTo(radius, radius);
+      ctx.arc(radius, radius, radius, angle, angle + (2 * Math.PI / segments));
+      ctx.closePath();
+      ctx.fillStyle = i < successSegments ? '#4CAF50' : '#F44336'; // green or red
+      ctx.fill();
+    }
+  }
+
+  // Wheel spinning logic
+  async function spinPieWheel(title, riskChance) {
     const overlay = document.getElementById('wheel-overlay');
-    const wheel = document.querySelector('.wheel');
     const titleEl = document.getElementById('wheel-title');
+    const canvas = document.getElementById('wheel-canvas');
+
+    const successRatio = 1 - riskChance;
+    drawWheel(successRatio);
 
     titleEl.textContent = title;
-    wheel.style.animation = 'none'; // reset animation
-    void wheel.offsetWidth; // force reflow
-    wheel.style.animation = 'spin 2s ease-out forwards';
-
     overlay.style.display = 'flex';
+
+    const spins = Math.floor(Math.random() * 3) + 3; // between 3-5 spins
+    const finalAngle = Math.random() * 360;
+    const totalRotation = (spins * 360) + finalAngle;
+
+    canvas.style.transform = `rotate(0deg)`;
+    void canvas.offsetWidth; // force reflow
+    canvas.style.transform = `rotate(${totalRotation}deg)`;
 
     return new Promise(resolve => {
       setTimeout(() => {
-        const outcome = Math.random() > riskChance; // success if > risk
+        const outcome = finalAngle < (360 * successRatio);
         overlay.style.display = 'none';
         resolve(outcome);
-      }, 2500);
+      }, 3200);
     });
   }
 
-  // Simulate each system in sequence
-  if (power === 'solar') success.power = await spinWheel('Power System (Solar Panel)', 0.25);
-  else if (power === 'fuelcell') success.power = await spinWheel('Power System (Fuel Cell)', 0.5);
-  else await spinWheel('Power System (Battery Pack)', 0); // always succeeds
+  // Simulate one at a time
+  if (power === 'solar') success.power = await spinPieWheel('Power System (Solar Panel)', 0.25);
+  else if (power === 'fuelcell') success.power = await spinPieWheel('Power System (Fuel Cell)', 0.5);
+  else await spinPieWheel('Power System (Battery Pack)', 0);
 
-  if (computer === 'arduino') success.computer = await spinWheel('Flight Computer (Arduino)', 0.5);
-  else await spinWheel('Flight Computer (Raspberry Pi)', 0); // always succeeds
+  if (computer === 'arduino') success.computer = await spinPieWheel('Flight Computer (Arduino)', 0.5);
+  else await spinPieWheel('Flight Computer (Raspberry Pi)', 0);
 
-  if (structure === 'interlocking') success.structure = await spinWheel('Structure (Interlocking)', 0.25);
-  else await spinWheel('Structure (Screw-type)', 0); // always succeeds
+  if (structure === 'interlocking') success.structure = await spinPieWheel('Structure (Interlocking)', 0.25);
+  else await spinPieWheel('Structure (Screw-type)', 0);
 
   // Final outcome
   let output = `<h2>Mission Outcome</h2>`;
