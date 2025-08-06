@@ -77,17 +77,9 @@ button:hover {
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 
-.wheel {
-  width: 200px;
-  height: 200px;
+#wheel-canvas {
+  display: block;
   margin: 20px auto;
-  border: 10px solid #ccc;
-  border-top: 10px solid #0077cc;
-  border-radius: 50%;
-  animation: spin 2s ease-out forwards;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(1080deg); } /* 3 full spins */
+  transform: rotate(0deg);
+  transition: transform 3s ease-out;
 }
