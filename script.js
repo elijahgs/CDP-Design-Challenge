@@ -65,9 +65,15 @@ document.getElementById('design-form').addEventListener('submit', async function
 
     return new Promise(resolve => {
       setTimeout(() => {
-        const pointerAngle = (360 - (totalRotation % 360)) % 360;
-        const successThreshold = 360 * successRatio;
-        const outcome = pointerAngle < successThreshold;
+      // Final pointer angle, normalized to 0–360 degrees
+      const normalized = (totalRotation % 360 + 360) % 360;
+
+      // The canvas starts at 3 o’clock (0°), so pointer (12 o’clock) is at -90°
+      const pointerAngle = (normalized + 90) % 360;
+
+      // Calculate outcome: pointer lands in green arc (success)
+      const successThreshold = 360 * successRatio;
+      const outcome = pointerAngle < successThreshold;
 
         resultLabel.textContent = outcome ? '✔️ Success!' : '❌ Failure';
         resultLabel.style.color = outcome ? '#4CAF50' : '#F44336';
