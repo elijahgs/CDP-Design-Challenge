@@ -77,9 +77,30 @@ button:hover {
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
 }
 
+#wheel-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+#pointer {
+  position: absolute;
+  top: -20px;
+  font-size: 24px;
+  color: #333;
+  z-index: 10;
+}
+
 #wheel-canvas {
   display: block;
-  margin: 20px auto;
+  margin-top: 20px;
   transform: rotate(0deg);
   transition: transform 3s ease-out;
+}
+
+#wheel-result-label {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-top: 20px;
 }
