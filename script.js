@@ -14,7 +14,6 @@ document.getElementById('design-form').addEventListener('submit', async function
   mass += (camera === 'compact') ? 1 : 2;
   mass += (power === 'battery') ? 3 : (power === 'solar') ? 2 : 1;
 
-  // Draw a simple two-part pie chart: green (success) and red (fail)
   function drawWheel(successRatio) {
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
@@ -23,7 +22,7 @@ document.getElementById('design-form').addEventListener('submit', async function
 
     const successAngle = 2 * Math.PI * successRatio;
 
-    // Draw success
+    // Success section (green)
     ctx.beginPath();
     ctx.moveTo(radius, radius);
     ctx.arc(radius, radius, radius, 0, successAngle);
@@ -31,7 +30,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.fillStyle = '#4CAF50';
     ctx.fill();
 
-    // Draw failure
+    // Failure section (red)
     ctx.beginPath();
     ctx.moveTo(radius, radius);
     ctx.arc(radius, radius, radius, successAngle, 2 * Math.PI);
@@ -40,7 +39,6 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.fill();
   }
 
-  // Spin the wheel toward a predetermined outcome
   async function spinWheelForOutcome(title, riskChance) {
     const overlay = document.getElementById('wheel-overlay');
     const titleEl = document.getElementById('wheel-title');
@@ -51,21 +49,29 @@ document.getElementById('design-form').addEventListener('submit', async function
     titleEl.textContent = title;
     overlay.style.display = 'flex';
 
-    // Determine outcome BEFORE spinning
-    const isSuccess = Math.random() > riskChance;
     const successRatio = 1 - riskChance;
+
+    // Determine outcome ahead of time
+    const isSuccess = Math.random() > riskChance;
     drawWheel(successRatio);
 
-    // Calculate target angle
-    const pointerOffset = -90; // top of the wheel
-    const minAngle = isSuccess ? 0 : 360 * successRatio;
-    const maxAngle = isSuccess ? 360 * successRatio : 360;
-    const targetAngle = Math.random() * (maxAngle - minAngle) + minAngle;
+    // Determine target landing angle for pointer at 12 o'clock (−90°)
+    let landingAngleDeg;
+    if (isSuccess) {
+      landingAngleDeg = Math.random() * (360 * successRatio);
+    } else {
+      landingAngleDeg = 360 * successRatio + Math.random() * (360 * (1 - successRatio));
+    }
 
-    // Spin a lot: 6–9 full rotations + final pointer alignment
-    const fullRotations = Math.floor(Math.random() * 4) + 6;
-    const totalRotation = fullRotations * 360 + targetAngle;
+    // Shift pointer offset: canvas starts at 0° = 3 o'clock, pointer is at 12 o'clock → +90°
+    const pointerOffset = 90;
+    const adjustedAngle = (landingAngleDeg + pointerOffset) % 360;
 
+    // Full revolutions + adjusted final angle
+    const fullSpins = Math.floor(Math.random() * 4) + 6; // always 6–9 spins
+    const totalRotation = fullSpins * 360 + adjustedAngle;
+
+    // Apply spin
     canvas.style.transform = `rotate(0deg)`;
     void canvas.offsetWidth;
     canvas.style.transform = `rotate(${totalRotation}deg)`;
@@ -82,7 +88,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     });
   }
 
-  // Simulate each subsystem using pathway 1 logic
+  // Subsystem spinning (with predetermined outcomes)
   if (power === 'solar') success.power = await spinWheelForOutcome('Power System (Solar Panel)', 0.25);
   else if (power === 'fuelcell') success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
   else await spinWheelForOutcome('Power System (Battery Pack)', 0);
@@ -93,7 +99,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   if (structure === 'interlocking') success.structure = await spinWheelForOutcome('Structure (Interlocking)', 0.25);
   else await spinWheelForOutcome('Structure (Screw-type)', 0);
 
-  // Final result summary
+  // Final report
   let output = `<h2>Mission Outcome</h2>`;
 
   if (mass > 6) {
@@ -112,3 +118,4 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   document.getElementById('results').innerHTML = output;
 });
+
