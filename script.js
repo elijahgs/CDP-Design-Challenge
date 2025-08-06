@@ -14,7 +14,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   mass += (camera === 'compact') ? 1 : 2;
   mass += (power === 'battery') ? 3 : (power === 'solar') ? 2 : 1;
 
-  // Wheel drawing function
+  // Wheel drawing function with labels
   function drawWheel(successRatio) {
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
@@ -31,8 +31,22 @@ document.getElementById('design-form').addEventListener('submit', async function
       ctx.moveTo(radius, radius);
       ctx.arc(radius, radius, radius, angle, angle + (2 * Math.PI / segments));
       ctx.closePath();
-      ctx.fillStyle = i < successSegments ? '#4CAF50' : '#F44336'; // green or red
+      ctx.fillStyle = i < successSegments ? '#4CAF50' : '#F44336';
       ctx.fill();
+    }
+
+    // Labels for every 10th segment
+    ctx.fillStyle = 'black';
+    ctx.font = '12px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    for (let i = 0; i < segments; i += 10) {
+      const angle = ((i + 5) / segments) * 2 * Math.PI;
+      const x = radius + (radius * 0.7) * Math.cos(angle);
+      const y = radius + (radius * 0.7) * Math.sin(angle);
+      const label = i < successSegments ? 'Success' : 'Fail';
+      ctx.fillText(label, x, y);
     }
   }
 
@@ -41,31 +55,37 @@ document.getElementById('design-form').addEventListener('submit', async function
     const overlay = document.getElementById('wheel-overlay');
     const titleEl = document.getElementById('wheel-title');
     const canvas = document.getElementById('wheel-canvas');
+    const resultLabel = document.getElementById('wheel-result-label');
 
+    resultLabel.textContent = '';
     const successRatio = 1 - riskChance;
     drawWheel(successRatio);
 
     titleEl.textContent = title;
     overlay.style.display = 'flex';
 
-    const spins = Math.floor(Math.random() * 3) + 3; // between 3-5 spins
+    const spins = Math.floor(Math.random() * 3) + 3; // 3–5 spins
     const finalAngle = Math.random() * 360;
     const totalRotation = (spins * 360) + finalAngle;
 
     canvas.style.transform = `rotate(0deg)`;
-    void canvas.offsetWidth; // force reflow
+    void canvas.offsetWidth;
     canvas.style.transform = `rotate(${totalRotation}deg)`;
 
     return new Promise(resolve => {
       setTimeout(() => {
         const outcome = finalAngle < (360 * successRatio);
-        overlay.style.display = 'none';
-        resolve(outcome);
+        resultLabel.textContent = outcome ? '✔️ Success!' : '❌ Failure';
+        resultLabel.style.color = outcome ? '#4CAF50' : '#F44336';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          resolve(outcome);
+        }, 1000);
       }, 3200);
     });
   }
 
-  // Simulate one at a time
+  // Simulate in sequence
   if (power === 'solar') success.power = await spinPieWheel('Power System (Solar Panel)', 0.25);
   else if (power === 'fuelcell') success.power = await spinPieWheel('Power System (Fuel Cell)', 0.5);
   else await spinPieWheel('Power System (Battery Pack)', 0);
@@ -76,9 +96,8 @@ document.getElementById('design-form').addEventListener('submit', async function
   if (structure === 'interlocking') success.structure = await spinPieWheel('Structure (Interlocking)', 0.25);
   else await spinPieWheel('Structure (Screw-type)', 0);
 
-  // Final outcome
+  // Final result
   let output = `<h2>Mission Outcome</h2>`;
-
   if (mass > 6) {
     output += `<p><strong>🚫 CubeSat too heavy!</strong> (${mass} mass units > 6)</p>`;
   } else if (!success.power) {
