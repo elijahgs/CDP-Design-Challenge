@@ -14,38 +14,42 @@ document.getElementById('design-form').addEventListener('submit', async function
   mass += (camera === 'compact') ? 1 : 2;
   mass += (power === 'battery') ? 3 : (power === 'solar') ? 2 : 1;
 
-  function drawWheel(successRatio) {
-    const canvas = document.getElementById('wheel-canvas');
-    const ctx = canvas.getContext('2d');
-    const radius = canvas.width / 2;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function drawWheel(successRatio, shouldRotate) {
+  const canvas = document.getElementById('wheel-canvas');
+  const ctx = canvas.getContext('2d');
+  const radius = canvas.width / 2;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const successAngle = 2 * Math.PI * successRatio;
+  const successAngle = 2 * Math.PI * successRatio;
 
+  if (shouldRotate) {
     // Rotate canvas so 0° starts at pointer (12 o'clock)
     ctx.save();
     ctx.translate(radius, radius);
-    ctx.rotate(-Math.PI / 2); // rotate -90 degrees
+    ctx.rotate(-Math.PI / 2);
     ctx.translate(-radius, -radius);
+  }
 
-    // Green success
-    ctx.beginPath();
-    ctx.moveTo(radius, radius);
-    ctx.arc(radius, radius, radius, 0, successAngle);
-    ctx.closePath();
-    ctx.fillStyle = '#4CAF50';
-    ctx.fill();
+  // Green success
+  ctx.beginPath();
+  ctx.moveTo(radius, radius);
+  ctx.arc(radius, radius, radius, 0, successAngle);
+  ctx.closePath();
+  ctx.fillStyle = '#4CAF50';
+  ctx.fill();
 
-    // Red fail
-    ctx.beginPath();
-    ctx.moveTo(radius, radius);
-    ctx.arc(radius, radius, radius, successAngle, 2 * Math.PI);
-    ctx.closePath();
-    ctx.fillStyle = '#F44336';
-    ctx.fill();
+  // Red fail
+  ctx.beginPath();
+  ctx.moveTo(radius, radius);
+  ctx.arc(radius, radius, radius, successAngle, 2 * Math.PI);
+  ctx.closePath();
+  ctx.fillStyle = '#F44336';
+  ctx.fill();
 
+  if (shouldRotate) {
     ctx.restore();
   }
+}
 
   async function spinWheelForOutcome(title, riskChance) {
     const overlay = document.getElementById('wheel-overlay');
@@ -58,8 +62,9 @@ document.getElementById('design-form').addEventListener('submit', async function
     overlay.style.display = 'flex';
 
     const successRatio = 1 - riskChance;
-    drawWheel(successRatio);
-
+    const shouldRotate = title.includes('Solar Panel'); // only rotate canvas for solar
+    drawWheel(successRatio, shouldRotate);
+    
     // Predetermine outcome
     const isSuccess = Math.random() > riskChance;
 
