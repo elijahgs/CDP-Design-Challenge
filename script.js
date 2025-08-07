@@ -58,14 +58,14 @@ document.getElementById('design-form').addEventListener('submit', async function
     // Make sure every spin has 6–9 full turns
     const fullSpins = Math.floor(Math.random() * 4) + 6; // 6–9 full spins
 
-    // Determine landing angle based on result
+    // Choose exact center of success or failure arc
     let landingAngleDeg;
     if (isSuccess) {
-      landingAngleDeg = Math.random() * (360 * successRatio);
+      landingAngleDeg = (360 * successRatio) / 2; // midpoint of green
     } else {
-      landingAngleDeg = 360 * successRatio + Math.random() * (360 * (1 - successRatio));
+      landingAngleDeg = 360 * successRatio + (360 * (1 - successRatio)) / 2; // midpoint of red
     }
-
+    
     const pointerOffset = 90; // account for pointer at 12 o'clock
     const adjustedAngle = (landingAngleDeg + pointerOffset) % 360;
     const totalRotation = fullSpins * 360 + adjustedAngle;
