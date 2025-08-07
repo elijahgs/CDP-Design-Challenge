@@ -9,7 +9,6 @@ document.getElementById('design-form').addEventListener('submit', async function
   let mass = 0;
   let success = { power: true, computer: true };
 
-  // Mass calculation (structure included for mass, but no spinner)
   mass += (structure === 'interlocking') ? 1 : 2;
   mass += (computer === 'arduino') ? 1 : 2;
   mass += (camera === 'compact') ? 1 : 2;
@@ -23,7 +22,7 @@ document.getElementById('design-form').addEventListener('submit', async function
 
     const successAngle = 2 * Math.PI * successRatio;
 
-    // Success arc
+    // Green success
     ctx.beginPath();
     ctx.moveTo(radius, radius);
     ctx.arc(radius, radius, radius, 0, successAngle);
@@ -31,7 +30,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.fillStyle = '#4CAF50';
     ctx.fill();
 
-    // Fail arc
+    // Red fail
     ctx.beginPath();
     ctx.moveTo(radius, radius);
     ctx.arc(radius, radius, radius, successAngle, 2 * Math.PI);
@@ -53,24 +52,25 @@ document.getElementById('design-form').addEventListener('submit', async function
     const successRatio = 1 - riskChance;
     drawWheel(successRatio);
 
+    // Predetermine outcome
     const isSuccess = Math.random() > riskChance;
 
-    // Make sure every spin has 6–9 full turns
-    const fullSpins = Math.floor(Math.random() * 4) + 6; // 6–9 full spins
-
-    // Choose exact center of success or failure arc
+    // Exact target angle (so pointer lands at center of correct zone)
     let landingAngleDeg;
     if (isSuccess) {
-      landingAngleDeg = (360 * successRatio) / 2; // midpoint of green
+      landingAngleDeg = (360 * successRatio) / 2; // middle of green
     } else {
-      landingAngleDeg = 360 * successRatio + (360 * (1 - successRatio)) / 2; // midpoint of red
+      landingAngleDeg = 360 * successRatio + (360 * (1 - successRatio)) / 2; // middle of red
     }
-    
-    const pointerOffset = 90; // account for pointer at 12 o'clock
-    const adjustedAngle = (landingAngleDeg + pointerOffset) % 360;
-    const totalRotation = fullSpins * 360 + adjustedAngle;
 
-    // Spin the wheel
+    const pointerOffset = 90; // because canvas starts at 3 o'clock, but pointer is at 12
+    const finalPointerAngle = (landingAngleDeg + pointerOffset) % 360;
+
+    // Force 6–9 full spins + exact alignment
+    const fullSpins = Math.floor(Math.random() * 4) + 6;
+    const totalRotation = fullSpins * 360 + finalPointerAngle;
+
+    // Spin wheel
     canvas.style.transition = 'none';
     canvas.style.transform = `rotate(0deg)`;
     void canvas.offsetWidth;
@@ -89,20 +89,19 @@ document.getElementById('design-form').addEventListener('submit', async function
     });
   }
 
-  // 🚀 SPIN POWER FIRST
+  // POWER SPIN
   if (power === 'solar') success.power = await spinWheelForOutcome('Power System (Solar Panel)', 0.25);
   else if (power === 'fuelcell') success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
-  else success.power = true; // Battery always succeeds
+  else success.power = true; // battery always passes
 
-  // 🧠 ONLY SPIN COMPUTER IF POWER SUCCEEDS
+  // FLIGHT COMPUTER SPIN — only if power passed
   if (success.power) {
     if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
-    else success.computer = true; // Pi always succeeds
+    else success.computer = true; // pi always passes
   }
 
-  // 🧾 MISSION OUTCOME REPORT
+  // FINAL OUTCOME
   let output = `<h2>Mission Outcome</h2>`;
-
   if (mass > 6) {
     output += `<p><strong>🚫 CubeSat too heavy!</strong> (${mass} mass units > 6)</p>`;
   } else if (!success.power) {
@@ -110,9 +109,9 @@ document.getElementById('design-form').addEventListener('submit', async function
   } else if (!success.computer) {
     output += `<p><strong>📷 Computer corrupted data.</strong> A glitched photo was recovered.</p>`;
   } else {
-    output += (camera === 'highres') ?
-      `<p><strong>✅ Success!</strong> A high-resolution photo was recovered.</p>` :
-      `<p><strong>✅ Success!</strong> A low-resolution photo was recovered.</p>`;
+    output += (camera === 'highres')
+      ? `<p><strong>✅ Success!</strong> A high-resolution photo was recovered.</p>`
+      : `<p><strong>✅ Success!</strong> A low-resolution photo was recovered.</p>`;
   }
 
   document.getElementById('results').innerHTML = output;
