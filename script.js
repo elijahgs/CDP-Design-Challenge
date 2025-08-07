@@ -7,8 +7,9 @@ document.getElementById('design-form').addEventListener('submit', async function
   const power = document.querySelector('input[name="power"]:checked').value;
 
   let mass = 0;
-  let success = { power: true, computer: true, structure: true };
+  let success = { power: true, computer: true };
 
+  // Mass calculation (structure included for mass, but no spinner)
   mass += (structure === 'interlocking') ? 1 : 2;
   mass += (computer === 'arduino') ? 1 : 2;
   mass += (camera === 'compact') ? 1 : 2;
@@ -22,7 +23,7 @@ document.getElementById('design-form').addEventListener('submit', async function
 
     const successAngle = 2 * Math.PI * successRatio;
 
-    // Success section (green)
+    // Success arc
     ctx.beginPath();
     ctx.moveTo(radius, radius);
     ctx.arc(radius, radius, radius, 0, successAngle);
@@ -30,7 +31,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.fillStyle = '#4CAF50';
     ctx.fill();
 
-    // Failure section (red)
+    // Fail arc
     ctx.beginPath();
     ctx.moveTo(radius, radius);
     ctx.arc(radius, radius, radius, successAngle, 2 * Math.PI);
@@ -50,12 +51,14 @@ document.getElementById('design-form').addEventListener('submit', async function
     overlay.style.display = 'flex';
 
     const successRatio = 1 - riskChance;
-
-    // Determine outcome ahead of time
-    const isSuccess = Math.random() > riskChance;
     drawWheel(successRatio);
 
-    // Determine target landing angle for pointer at 12 o'clock (−90°)
+    const isSuccess = Math.random() > riskChance;
+
+    // Make sure every spin has 6–9 full turns
+    const fullSpins = Math.floor(Math.random() * 4) + 6; // 6–9 full spins
+
+    // Determine landing angle based on result
     let landingAngleDeg;
     if (isSuccess) {
       landingAngleDeg = Math.random() * (360 * successRatio);
@@ -63,17 +66,15 @@ document.getElementById('design-form').addEventListener('submit', async function
       landingAngleDeg = 360 * successRatio + Math.random() * (360 * (1 - successRatio));
     }
 
-    // Shift pointer offset: canvas starts at 0° = 3 o'clock, pointer is at 12 o'clock → +90°
-    const pointerOffset = 90;
+    const pointerOffset = 90; // account for pointer at 12 o'clock
     const adjustedAngle = (landingAngleDeg + pointerOffset) % 360;
-
-    // Full revolutions + adjusted final angle
-    const fullSpins = Math.floor(Math.random() * 4) + 6; // always 6–9 spins
     const totalRotation = fullSpins * 360 + adjustedAngle;
 
-    // Apply spin
+    // Spin the wheel
+    canvas.style.transition = 'none';
     canvas.style.transform = `rotate(0deg)`;
     void canvas.offsetWidth;
+    canvas.style.transition = 'transform 3.5s ease-out';
     canvas.style.transform = `rotate(${totalRotation}deg)`;
 
     return new Promise(resolve => {
@@ -88,26 +89,24 @@ document.getElementById('design-form').addEventListener('submit', async function
     });
   }
 
-  // Subsystem spinning (with predetermined outcomes)
+  // 🚀 SPIN POWER FIRST
   if (power === 'solar') success.power = await spinWheelForOutcome('Power System (Solar Panel)', 0.25);
   else if (power === 'fuelcell') success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
-  else await spinWheelForOutcome('Power System (Battery Pack)', 0);
+  else success.power = true; // Battery always succeeds
 
-  if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
-  else await spinWheelForOutcome('Flight Computer (Raspberry Pi)', 0);
+  // 🧠 ONLY SPIN COMPUTER IF POWER SUCCEEDS
+  if (success.power) {
+    if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
+    else success.computer = true; // Pi always succeeds
+  }
 
-  if (structure === 'interlocking') success.structure = await spinWheelForOutcome('Structure (Interlocking)', 0.25);
-  else await spinWheelForOutcome('Structure (Screw-type)', 0);
-
-  // Final report
+  // 🧾 MISSION OUTCOME REPORT
   let output = `<h2>Mission Outcome</h2>`;
 
   if (mass > 6) {
     output += `<p><strong>🚫 CubeSat too heavy!</strong> (${mass} mass units > 6)</p>`;
   } else if (!success.power) {
     output += `<p><strong>⚡ Power system failed.</strong> No photo taken.</p>`;
-  } else if (!success.structure) {
-    output += `<p><strong>💥 Structure failed drop test.</strong> SD card destroyed. No photo recovered.</p>`;
   } else if (!success.computer) {
     output += `<p><strong>📷 Computer corrupted data.</strong> A glitched photo was recovered.</p>`;
   } else {
@@ -118,4 +117,3 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   document.getElementById('results').innerHTML = output;
 });
-
