@@ -22,6 +22,12 @@ document.getElementById('design-form').addEventListener('submit', async function
 
     const successAngle = 2 * Math.PI * successRatio;
 
+    // Rotate canvas so 0° starts at pointer (12 o'clock)
+    ctx.save();
+    ctx.translate(radius, radius);
+    ctx.rotate(-Math.PI / 2); // rotate -90 degrees
+    ctx.translate(-radius, -radius);
+
     // Green success
     ctx.beginPath();
     ctx.moveTo(radius, radius);
@@ -37,6 +43,8 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.closePath();
     ctx.fillStyle = '#F44336';
     ctx.fill();
+
+    ctx.restore();
   }
 
   async function spinWheelForOutcome(title, riskChance) {
