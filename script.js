@@ -71,8 +71,7 @@ document.getElementById('design-form').addEventListener('submit', async function
       landingAngleDeg = 360 * successRatio + (360 * (1 - successRatio)) / 2; // middle of red
     }
 
-    const pointerOffset = 90; // because canvas starts at 3 o'clock, but pointer is at 12
-    const finalPointerAngle = (landingAngleDeg + pointerOffset) % 360;
+    const finalPointerAngle = landingAngleDeg % 360;
 
     // Force 6–9 full spins + exact alignment
     const fullSpins = Math.floor(Math.random() * 4) + 6;
