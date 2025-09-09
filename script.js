@@ -12,7 +12,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   let success = {
     power: true,
     computer: true,
-    dataDownlink: false,
+    dataDownlink: true,
     weather: true
   };
 
@@ -36,10 +36,8 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.save();
     ctx.translate(radius, radius);
 
-    if (spinnerName === 'Power System (Solar Panel)') {
+    if (spinnerName === 'Power System (Solar Panel)' || spinnerName === 'Image Downlink' || spinnerName === 'Extreme Weather Event') {
       ctx.rotate(-Math.PI / 2);
-    } else if (spinnerName === 'Extreme Weather Event') {
-       ctx.rotate(-Math.PI / 2);
     }
 
     ctx.translate(-radius, -radius);
@@ -119,52 +117,57 @@ document.getElementById('design-form').addEventListener('submit', async function
   }
   // Volume limit remains at 5 units.
   const volume = (structure === 'interlocking') ? 1 : 2;
-  if (volume > 5) { // Assuming other components don't add to volume. This check might be more complex if they did.
+  if (volume > 5) { 
     output += `<p><strong>🚫 CubeSat too large!</strong></p>`;
     document.getElementById('results').innerHTML = output;
     return;
   }
 
-  // Extreme weather event spinner (always spins)
-  const isExtremeWeather = await spinWheelForOutcome('Extreme Weather Event', 0.1);
-  if (isExtremeWeather && foil === 'no') {
-      success.weather = false;
-  }
-  
   // Power system spinner
-  if (success.weather) {
-      if (power === 'solar') success.power = await spinWheelForOutcome('Power System (Solar Panel)', 0.25);
-      else if (power === 'fuelcell') success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
-      else success.power = true;
+  if (power === 'solar') success.power = await spinWheelForOutcome('Power System (Solar Panel)', 0.25);
+  else if (power === 'fuelcell') success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
+  else success.power = true;
+
+  if (!success.power) {
+      output += `<p><strong>⚡ Power system failed.</strong> No photo taken.</p>`;
+      document.getElementById('results').innerHTML = output;
+      return;
+  }
+
+  // Flight computer spinner
+  if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
+  else success.computer = true;
+
+  if (!success.computer) {
+      output += `<p><strong>📷 Computer corrupted data.</strong> A glitched photo was recovered.</p>`;
+      document.getElementById('results').innerHTML = output;
+      return;
+  }
+
+  // Antenna spinner
+  if (antenna === 'helical' && camera === 'highres') {
+      success.dataDownlink = await spinWheelForOutcome('Image Downlink', 0.5);
+  } else {
+      success.dataDownlink = true;
+  }
+
+  // Extreme weather event spinner (always spins)
+  const weatherOccurs = await spinWheelForOutcome('Extreme Weather Event', 0.1);
+  if (weatherOccurs) {
+      if (foil === 'no') {
+          success.weather = false;
+      }
   }
   
-  // Flight computer spinner (only if power and weather passed)
-  if (success.weather && success.power) {
-      if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
-      else success.computer = true;
-  }
-
-  // Data downlink chance for Helical Antenna
-  if (antenna === 'helical') {
-      success.dataDownlink = Math.random() < 0.5;
-  } else {
-      // Dipole always succeeds in basic communications
-      success.dataDownlink = true; 
-  }
-
   // Final mission result
   if (!success.weather) {
     output += `<p><strong>🥶 Extreme weather event caused mission failure.</strong></p>`;
-  } else if (!success.power) {
-    output += `<p><strong>⚡ Power system failed.</strong> No photo taken.</p>`;
-  } else if (!success.computer) {
-    output += `<p><strong>📷 Computer corrupted data.</strong> A glitched photo was recovered.</p>`;
-  } else if (camera === 'highres' && !success.dataDownlink) {
+  } else if (!success.dataDownlink) {
      output += `<p><strong>📡 Data downlink failed.</strong> The high-resolution photo was not recovered.</p>`;
   } else {
     let photoStatus = (camera === 'highres') ? 'A high-resolution photo was recovered.' : 'A low-resolution photo was recovered.';
-    if (camera === 'highres' && antenna === 'helical' && success.dataDownlink) {
-        photoStatus += ' The Helical Antenna successfully downlinked the photo.';
+    if (weatherOccurs && foil === 'yes') {
+        photoStatus += ' System was protected by insulation foil.';
     }
     output += `<p><strong>✅ Success!</strong> ${photoStatus}</p>`;
   }
