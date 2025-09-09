@@ -1,63 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>BSA CubeSat Rapid Design Challenge</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BSA CubeSat Design Challenge</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>BSA CubeSat Rapid Design Challenge</h1>
+  <main>
+    <h1>BSA CubeSat Rapid Design Challenge</h1>
+    <form id="design-form">
+      <section>
+        <h2>Structure</h2>
+        <label><input type="radio" name="structure" value="interlocking" required /> Interlocking (1 mass unit)</label><br/>
+        <label><input type="radio" name="structure" value="screw" required /> Screw-type (2 mass units)</label>
+      </section>
 
-  <form id="design-form">
+      <section>
+        <h2>Antenna</h2>
+        <label><input type="radio" name="antenna" value="dipole" required /> Dipole Antenna (1 mass unit)</label><br/>
+        <label><input type="radio" name="antenna" value="helical" required /> Helical Antenna (2 mass units, 50% image downlink chance)</label>
+      </section>
 
-    <fieldset>
-      <legend>Structures</legend>
-      <label><input type="radio" name="structure" value="interlocking" required> Interlocking (1 mass units)</label>
-      <label><input type="radio" name="structure" value="screw"> Screw-Type (2 mass units)</label>
-    </fieldset>
+      <section>
+        <h2>Avionics - Computer</h2>
+        <label><input type="radio" name="computer" value="arduino" required /> Arduino (1 mass units, 50% data corruption risk)</label><br/>
+        <label><input type="radio" name="computer" value="pi" required /> Raspberry Pi (2 mass units, reliable)</label>
+      </section>
 
-    <fieldset>
-      <legend>Communications (Antenna)</legend>
-      <label><input type="radio" name="antenna" value="dipole" required> Dipole (1 mass units)</label>
-      <label><input type="radio" name="antenna" value="helical"> Helical (2 mass units, 50% image downlink chance)</label>
-    </fieldset>
+      <section>
+        <h2>Avionics - Camera</h2>
+        <label><input type="radio" name="camera" value="compact" required /> Low-Res Camera (1 mass unit)</label><br/>
+        <label><input type="radio" name="camera" value="highres" required /> High-Res Camera (2 mass units)</label>
+      </section>
 
-    <fieldset>
-      <legend>Avionics (Flight Computer)</legend>
-      <label><input type="radio" name="computer" value="arduino" required> Arduino (1 mass unit, 50% image corruption risk)</label>
-      <label><input type="radio" name="computer" value="raspberry"> Raspberry Pi (2 mass unts)</label>
-    </fieldset>
+      <section>
+        <h2>Power System</h2>
+        <label><input type="radio" name="power" value="battery" required /> Battery Pack (3 mass units, reliable)</label><br/>
+        <label><input type="radio" name="power" value="solar" required /> Solar Panels (2 mass units, 25% system failure risk)</label><br/>
+        <label><input type="radio" name="power" value="fuelcell" required /> Fuel Cell (1 mass unit, 50% system failure risk)</label>
+      </section>
 
-    <fieldset>
-      <legend>Payload (Camera)</legend>
-      <label><input type="radio" name="camera" value="low-resolution" required> Compact (1 mass unit)</label>
-      <label><input type="radio" name="camera" value="high-resolution"> High-Res (2 mass units)</label>
-    </fieldset>
+      <section>
+        <h2>Thermal Protection</h2>
+        <label><input type="radio" name="foil" value="yes" required /> Insulation Foil (1 mass unit)</label><br/>
+        <label><input type="radio" name="foil" value="no" required /> No Insulation Foil</label>
+      </section>
 
-    <fieldset>
-      <legend>Power System</legend>
-      <label><input type="radio" name="power" value="battery" required> Battery Pack (3 mass units, reliable)</label>
-      <label><input type="radio" name="power" value="solar"> Solar Panels (2 mass, 25% system failure risk)</label>
-      <label><input type="radio" name="power" value="fuelcell"> Fuel Cell Prototype (1 mass, 50% system failure risk)</label>
-    </fieldset>
+      <button type="submit">Simulate Launch</button>
+    </form>
 
-    <fieldset>
-      <legend>Thermal Protection</legend>
-      <label><input type="checkbox" id="insulation"> Add Insulation Foil (1 mass unit, protects from extreme weather)</label>
-    </fieldset>
+    <div id="results"></div>
 
-    <button type="submit">Simulate Mission</button>
-  </form>
-
-  <div id="results"></div>
-
-  <div id="wheel-overlay">
-    <div>
-      <h2 id="wheel-title"></h2>
-      <canvas id="wheel-canvas" width="400" height="400"></canvas>
-      <p id="wheel-result-label"></p>
+<div id="wheel-overlay">
+  <div id="wheel-container">
+    <h2 id="wheel-title">Spinning...</h2>
+    <div id="wheel-wrapper">
+      <div id="pointer">▼</div>
+      <canvas id="wheel-canvas" width="300" height="300"></canvas>
     </div>
+    <div id="wheel-result-label"></div>
   </div>
+</div>
+    
+  </main>
 
   <script src="script.js"></script>
 </body>
