@@ -123,7 +123,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     return;
   }
 
-  // Power system spinner
+  // Power system spinner (first)
   if (power === 'solar') success.power = await spinWheelForOutcome('Power System (Solar Panel)', 0.25);
   else if (power === 'fuelcell') success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
   else success.power = true;
@@ -134,24 +134,18 @@ document.getElementById('design-form').addEventListener('submit', async function
       return;
   }
 
-  // Flight computer spinner
+  // Flight computer spinner (second)
   if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
   else success.computer = true;
 
-  if (!success.computer) {
-      output += `<p><strong>📷 Computer corrupted data.</strong> A glitched photo was recovered.</p>`;
-      document.getElementById('results').innerHTML = output;
-      return;
-  }
-
-  // Antenna spinner
-  if (antenna === 'helical' && camera === 'highres') {
+  // Antenna spinner (third)
+  if (antenna === 'helical') {
       success.dataDownlink = await spinWheelForOutcome('Image Downlink', 0.5);
   } else {
       success.dataDownlink = true;
   }
 
-  // Extreme weather event spinner (always spins)
+  // Extreme weather event spinner (last)
   const weatherOccurs = await spinWheelForOutcome('Extreme Weather Event', 0.1);
   if (weatherOccurs) {
       if (foil === 'no') {
@@ -163,7 +157,13 @@ document.getElementById('design-form').addEventListener('submit', async function
   if (!success.weather) {
     output += `<p><strong>🥶 Extreme weather event caused mission failure.</strong></p>`;
   } else if (!success.dataDownlink) {
-     output += `<p><strong>📡 Data downlink failed.</strong> The high-resolution photo was not recovered.</p>`;
+     output += `<p><strong>📡 Data downlink failed.</strong> The image was not recovered.</p>`;
+  } else if (!success.computer) {
+      let photoStatus = (camera === 'highres') ? 'A high-resolution photo was recovered.' : 'A low-resolution photo was recovered.';
+      if (weatherOccurs && foil === 'yes') {
+          photoStatus += ' System was protected by insulation foil.';
+      }
+      output += `<p><strong>✅ Success!</strong> Computer corrupted data, but a glitched photo was recovered. ${photoStatus}</p>`;
   } else {
     let photoStatus = (camera === 'highres') ? 'A high-resolution photo was recovered.' : 'A low-resolution photo was recovered.';
     if (weatherOccurs && foil === 'yes') {
