@@ -24,8 +24,8 @@ document.getElementById('design-form').addEventListener('submit', async function
   mass += (power === 'battery') ? 3 : (power === 'solar') ? 2 : 1;
   mass += (foil === 'yes') ? 1 : 0;
 
-  // Draws the probability wheel with optional canvas rotation
-  function drawWheel(successRatio, spinnerName) {
+  // Draws the probability wheel
+  function drawWheel(successRatio) {
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
     const radius = canvas.width / 2;
@@ -33,19 +33,10 @@ document.getElementById('design-form').addEventListener('submit', async function
 
     const successAngle = 2 * Math.PI * successRatio;
 
-    ctx.save();
-    ctx.translate(radius, radius);
-
-    if (spinnerName === 'Power System (Solar Panel)' || spinnerName === 'Image Downlink' || spinnerName === 'Extreme Weather Event') {
-      ctx.rotate(-Math.PI / 2);
-    }
-
-    ctx.translate(-radius, -radius);
-
     // Green success zone
     ctx.beginPath();
     ctx.moveTo(radius, radius);
-    ctx.arc(radius, radius, radius, 0, successAngle);
+    ctx.arc(radius, radius, radius, -Math.PI / 2, -Math.PI / 2 + successAngle);
     ctx.closePath();
     ctx.fillStyle = '#4CAF50';
     ctx.fill();
@@ -53,12 +44,10 @@ document.getElementById('design-form').addEventListener('submit', async function
     // Red failure zone
     ctx.beginPath();
     ctx.moveTo(radius, radius);
-    ctx.arc(radius, radius, radius, successAngle, 2 * Math.PI);
+    ctx.arc(radius, radius, radius, -Math.PI / 2 + successAngle, 2 * Math.PI - Math.PI / 2);
     ctx.closePath();
     ctx.fillStyle = '#F44336';
     ctx.fill();
-
-    ctx.restore();
   }
 
   // Spinning animation and outcome resolution
@@ -73,22 +62,19 @@ document.getElementById('design-form').addEventListener('submit', async function
     overlay.style.display = 'flex';
 
     const successRatio = 1 - riskChance;
-    drawWheel(successRatio, title);
+    drawWheel(successRatio);
 
     const isSuccess = Math.random() > riskChance;
 
-    let landingAngleDeg;
+    let landingAngle;
     if (isSuccess) {
-      landingAngleDeg = (360 * successRatio) / 2;
+      landingAngle = Math.random() * successRatio;
     } else {
-      landingAngleDeg = 360 * successRatio + (360 * (1 - successRatio)) / 2;
+      landingAngle = successRatio + Math.random() * (1 - successRatio);
     }
-
-    const pointerOffset = 90;
-    const finalPointerAngle = (landingAngleDeg + pointerOffset) % 360;
-
-    const fullSpins = Math.floor(Math.random() * 4) + 6;
-    const totalRotation = fullSpins * 360 + finalPointerAngle;
+    
+    // Convert to degrees and apply the pointer's starting position
+    const totalRotation = (Math.random() * 5 + 5) * 360 + landingAngle * 360;
 
     canvas.style.transition = 'none';
     canvas.style.transform = `rotate(0deg)`;
