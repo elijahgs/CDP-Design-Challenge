@@ -51,7 +51,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   }
 
   // Spinning animation and outcome resolution
-  async function spinWheelForOutcome(title, riskChance) {
+  async function spinWheelForOutcome(title, riskChance, pointerOffset) {
     const overlay = document.getElementById('wheel-overlay');
     const titleEl = document.getElementById('wheel-title');
     const canvas = document.getElementById('wheel-canvas');
@@ -74,7 +74,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     }
     
     // Convert to degrees and apply the pointer's starting position
-    const totalRotation = (Math.random() * 5 + 5) * 360 + landingAngle * 360;
+    const totalRotation = (Math.random() * 5 + 5) * 360 + landingAngle * 360 + pointerOffset;
 
     canvas.style.transition = 'none';
     canvas.style.transform = `rotate(0deg)`;
@@ -110,8 +110,8 @@ document.getElementById('design-form').addEventListener('submit', async function
   }
 
   // Power system spinner (first)
-  if (power === 'solar') success.power = await spinWheelForOutcome('Power System (Solar Panel)', 0.25);
-  else if (power === 'fuelcell') success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
+  if (power === 'solar') success.power = await spinWheelForOutcome('Power System (Solar Panel)', 0.25, -90);
+  else if (power === 'fuelcell') success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5, -90);
   else success.power = true;
 
   if (!success.power) {
@@ -121,18 +121,18 @@ document.getElementById('design-form').addEventListener('submit', async function
   }
 
   // Flight computer spinner (second)
-  if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
+  if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5, -90);
   else success.computer = true;
 
   // Antenna spinner (third)
   if (antenna === 'helical') {
-      success.dataDownlink = await spinWheelForOutcome('Image Downlink', 0.5);
+      success.dataDownlink = await spinWheelForOutcome('Image Downlink', 0.5, -90);
   } else {
       success.dataDownlink = true;
   }
 
   // Extreme weather event spinner (last)
-  const weatherOccurs = await spinWheelForOutcome('Extreme Weather Event', 0.1);
+  const weatherOccurs = await spinWheelForOutcome('Extreme Weather Event', 0.1, 0);
   if (weatherOccurs) {
       if (foil === 'no') {
           success.weather = false;
