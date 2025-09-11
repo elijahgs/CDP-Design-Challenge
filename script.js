@@ -134,14 +134,22 @@ document.getElementById('design-form').addEventListener('submit', async function
   else if (power === 'fuelcell') success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
   else success.power = true;
 
+  // Flight computer spinner (affects photo quality only)
   if (success.power) {
-    if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
-    else success.computer = true;
+    if (computer === 'arduino') {
+      success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
+    } else {
+      success.computer = true; // Raspberry Pi always clean
+    }
   }
 
-  if (success.power && success.computer) {
-    if (antenna === 'helical') success.antenna = await spinWheelForOutcome('Antenna (Helical)', 0.5);
-    else success.antenna = true;
+  // Antenna spinner (runs as long as power succeeded)
+  if (success.power) {
+    if (antenna === 'helical') {
+      success.antenna = await spinWheelForOutcome('Antenna (Helical)', 0.5);
+    } else {
+      success.antenna = true; // Dipole always passes
+    }
   }
 
   // --- Final mission result ---
@@ -152,15 +160,16 @@ document.getElementById('design-form').addEventListener('submit', async function
     output += `<p><strong>🚫 CubeSat too large!</strong> (${volume} volume units > 5)</p>`;
   } else if (!success.power) {
     output += `<p><strong>⚡ Power system failed.</strong> No photo taken.</p>`;
-  } else if (!success.computer) {
-    output += `<p><strong>📷 Computer corrupted data.</strong> A glitched photo was recovered.</p>`;
   } else if (!success.antenna) {
     output += `<p><strong>📡 Antenna downlink failed.</strong> No photo received on Earth.</p>`;
+  } else if (!success.computer) {
+    output += `<p><strong>📷 Computer corrupted data.</strong> A glitched photo was downlinked.</p>`;
   } else {
     output += (camera === 'highres')
-      ? `<p><strong>✅ Success!</strong> A high-resolution photo was recovered.</p>`
-      : `<p><strong>✅ Success!</strong> A low-resolution photo was recovered.</p>`;
+      ? `<p><strong>✅ Success!</strong> A high-resolution photo was downlinked.</p>`
+      : `<p><strong>✅ Success!</strong> A low-resolution photo was downlinked.</p>`;
   }
 
   document.getElementById('results').innerHTML = output;
+
 });
