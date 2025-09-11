@@ -71,7 +71,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     }
 
     if (spinnerName === 'Extreme Cold Weather Event') {
-      ctx.rotate(-Math.PI / 2 - (Math.PI * 0.3)); // extra offset for 90/10
+      ctx.rotate(-Math.PI / 2 - (Math.PI * 0.4)); // extra offset for 90/10
     }
 
     ctx.translate(-radius, -radius);
@@ -165,7 +165,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   // --- Final mission result ---
   let output = `<h2>Mission Outcome</h2>`;
   if (mass > 7) {
-    output += `<p><strong>🚫 CubeSat too heavy!</strong> (${mass} mass units > 6)</p>`;
+    output += `<p><strong>🚫 CubeSat too heavy!</strong> (${mass} mass units > 7)</p>`;
   } else if (volume > 5) {
     output += `<p><strong>🚫 CubeSat too large!</strong> (${volume} volume units > 5)</p>`;
   } else if (!success.power) {
