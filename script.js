@@ -36,8 +36,8 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.save();
     ctx.translate(radius, radius);
 
-    // Apply a specific rotation offset only to the solar panel spinner
-    if (spinnerName === 'Power System (Solar Panel)') {
+    // Apply specific rotation offsets based on the spinner name
+    if (spinnerName === 'Power System (Solar Panel)' || spinnerName === 'Power System (Fuel Cell)' || spinnerName === 'Flight Computer (Arduino)' || spinnerName === 'Image Downlink') {
       ctx.rotate(-Math.PI / 2); // 90 degree rotation
     }
 
