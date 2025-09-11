@@ -71,7 +71,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     }
 
     if (spinnerName === 'Extreme Cold Weather Event') {
-      ctx.rotate(-Math.PI / 2 - (Math.PI * 0.2)); // extra offset for 90/10
+      ctx.rotate(-Math.PI / 2 - (Math.PI * 0.3)); // extra offset for 90/10
     }
 
     ctx.translate(-radius, -radius);
