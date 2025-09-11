@@ -66,7 +66,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.save();
     ctx.translate(radius, radius);
 
-    if (spinnerName === 'Power System (Solar Panel)') {
+    if (spinnerName === 'Power System (Solar Panel)' || spinnerName === 'Extreme Cold Weather Event') {
       ctx.rotate(-Math.PI / 2);
     }
 
@@ -160,7 +160,7 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   // --- Final mission result ---
   let output = `<h2>Mission Outcome</h2>`;
-  if (mass > 6) {
+  if (mass > 7) {
     output += `<p><strong>🚫 CubeSat too heavy!</strong> (${mass} mass units > 6)</p>`;
   } else if (volume > 5) {
     output += `<p><strong>🚫 CubeSat too large!</strong> (${volume} volume units > 5)</p>`;
