@@ -2,29 +2,50 @@ document.getElementById('design-form').addEventListener('submit', async function
   e.preventDefault();
 
   const structure = document.querySelector('input[name="structure"]:checked').value;
-  const antenna = document.querySelector('input[name="antenna"]:checked').value;
   const computer = document.querySelector('input[name="computer"]:checked').value;
   const camera = document.querySelector('input[name="camera"]:checked').value;
   const power = document.querySelector('input[name="power"]:checked').value;
-  const foil = document.querySelector('input[name="foil"]:checked').value;
 
   let mass = 0;
-  let success = {
-    power: true,
-    computer: true,
-    dataDownlink: true,
-    weather: true
-  };
+  let volume = 0;
+  let success = { power: true, computer: true };
 
-  // Calculate mass
+  // --- Mass and Volume Calculation ---
+  // Structures (mass only, no volume impact)
   mass += (structure === 'interlocking') ? 1 : 2;
-  mass += (antenna === 'dipole') ? 1 : 2;
-  mass += (computer === 'arduino') ? 1 : 2;
-  mass += (camera === 'compact') ? 1 : 2;
-  mass += (power === 'battery') ? 3 : (power === 'solar') ? 2 : 1;
-  mass += (foil === 'yes') ? 1 : 0;
+  // Interlocking & Screw-type explicitly no volume impact
 
-  // Draws the probability wheel
+  // Flight computer
+  if (computer === 'arduino') {
+    mass += 1;
+    volume += 2;
+  } else { // raspberry
+    mass += 2;
+    volume += 2;
+  }
+
+  // Camera
+  if (camera === 'compact') {
+    mass += 1;
+    volume += 2;
+  } else { // highres
+    mass += 2;
+    volume += 2;
+  }
+
+  // Power system
+  if (power === 'battery') {
+    mass += 3;
+    volume += 2;
+  } else if (power === 'solar') {
+    mass += 2;
+    volume += 1;
+  } else { // fuelcell
+    mass += 1;
+    volume += 1;
+  }
+
+  // --- Spinner functions unchanged ---
   function drawWheel(successRatio, spinnerName) {
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
@@ -32,27 +53,26 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const successAngle = 2 * Math.PI * successRatio;
-    
+
     ctx.save();
     ctx.translate(radius, radius);
 
-    // Apply specific rotation offsets based on the spinner name
-    if (spinnerName === 'Power System (Solar Panel)' || spinnerName === 'Power System (Fuel Cell)' || spinnerName === 'Flight Computer (Arduino)' || spinnerName === 'Image Downlink') {
-      ctx.rotate(-Math.PI / 2); // 90 degree rotation
+    if (spinnerName === 'Power System (Solar Panel)') {
+      ctx.rotate(-Math.PI / 2);
     }
 
-    // Green success zone
+    ctx.translate(-radius, -radius);
+
     ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.arc(0, 0, radius, -Math.PI / 2, -Math.PI / 2 + successAngle);
+    ctx.moveTo(radius, radius);
+    ctx.arc(radius, radius, radius, 0, successAngle);
     ctx.closePath();
     ctx.fillStyle = '#4CAF50';
     ctx.fill();
 
-    // Red failure zone
     ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.arc(0, 0, radius, -Math.PI / 2 + successAngle, 2 * Math.PI - Math.PI / 2);
+    ctx.moveTo(radius, radius);
+    ctx.arc(radius, radius, radius, successAngle, 2 * Math.PI);
     ctx.closePath();
     ctx.fillStyle = '#F44336';
     ctx.fill();
@@ -60,7 +80,6 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.restore();
   }
 
-  // Spinning animation and outcome resolution
   async function spinWheelForOutcome(title, riskChance) {
     const overlay = document.getElementById('wheel-overlay');
     const titleEl = document.getElementById('wheel-title');
@@ -76,15 +95,18 @@ document.getElementById('design-form').addEventListener('submit', async function
 
     const isSuccess = Math.random() > riskChance;
 
-    let landingAngle;
+    let landingAngleDeg;
     if (isSuccess) {
-      landingAngle = Math.random() * successRatio;
+      landingAngleDeg = (360 * successRatio) / 2;
     } else {
-      landingAngle = successRatio + Math.random() * (1 - successRatio);
+      landingAngleDeg = 360 * successRatio + (360 * (1 - successRatio)) / 2;
     }
-    
-    // Convert to degrees and apply the pointer's starting position
-    const totalRotation = (Math.random() * 5 + 5) * 360 + landingAngle * 360;
+
+    const pointerOffset = 90;
+    const finalPointerAngle = (landingAngleDeg + pointerOffset) % 360;
+
+    const fullSpins = Math.floor(Math.random() * 4) + 6;
+    const totalRotation = fullSpins * 360 + finalPointerAngle;
 
     canvas.style.transition = 'none';
     canvas.style.transform = `rotate(0deg)`;
@@ -104,68 +126,31 @@ document.getElementById('design-form').addEventListener('submit', async function
     });
   }
 
-  // Check mass and volume limits
-  let output = `<h2>Mission Outcome</h2>`;
-  if (mass > 7) {
-    output += `<p><strong>🚫 CubeSat too heavy!</strong> (${mass} mass units > 7)</p>`;
-    document.getElementById('results').innerHTML = output;
-    return;
-  }
-  // Volume limit remains at 5 units.
-  const volume = (structure === 'interlocking') ? 1 : 2;
-  if (volume > 5) { 
-    output += `<p><strong>🚫 CubeSat too large!</strong></p>`;
-    document.getElementById('results').innerHTML = output;
-    return;
-  }
-
-  // Power system spinner (first)
+  // Power system spinner
   if (power === 'solar') success.power = await spinWheelForOutcome('Power System (Solar Panel)', 0.25);
   else if (power === 'fuelcell') success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
-  else success.power = true;
+  else success.power = true; // Battery always passes
 
-  if (!success.power) {
-      output += `<p><strong>⚡ Power system failed.</strong> No photo taken.</p>`;
-      document.getElementById('results').innerHTML = output;
-      return;
+  // Flight computer spinner
+  if (success.power) {
+    if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
+    else success.computer = true; // Raspberry Pi always passes
   }
 
-  // Flight computer spinner (second)
-  if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
-  else success.computer = true;
-
-  // Antenna spinner (third)
-  if (antenna === 'helical') {
-      success.dataDownlink = await spinWheelForOutcome('Image Downlink', 0.5);
-  } else {
-      success.dataDownlink = true;
-  }
-
-  // Extreme weather event spinner (last)
-  const weatherOccurs = await spinWheelForOutcome('Extreme Weather Event', 0.1);
-  if (weatherOccurs) {
-      if (foil === 'no') {
-          success.weather = false;
-      }
-  }
-  
-  // Final mission result
-  if (!success.weather) {
-    output += `<p><strong>🥶 Extreme weather event caused mission failure.</strong></p>`;
-  } else if (!success.dataDownlink) {
-     output += `<p><strong>📡 Data downlink failed.</strong> The image was not recovered.</p>`;
+  // --- Final mission result ---
+  let output = `<h2>Mission Outcome</h2>`;
+  if (mass > 6) {
+    output += `<p><strong>🚫 CubeSat too heavy!</strong> (${mass} mass units > 6)</p>`;
+  } else if (volume > 5) {
+    output += `<p><strong>🚫 CubeSat too large!</strong> (${volume} volume units > 5)</p>`;
+  } else if (!success.power) {
+    output += `<p><strong>⚡ Power system failed.</strong> No photo taken.</p>`;
   } else if (!success.computer) {
-      let photoStatus = (camera === 'highres') ? 'A high-resolution photo was recovered.' : 'A low-resolution photo was recovered.';
-      if (weatherOccurs && foil === 'yes') {
-          photoStatus += ' System was protected by insulation foil.';
-      }
-      output += `<p><strong>✅ Success!</strong> Computer corrupted data, but a glitched photo was recovered. ${photoStatus}</p>`;
+    output += `<p><strong>📷 Computer corrupted data.</strong> A glitched photo was recovered.</p>`;
   } else {
-    let photoStatus = (camera === 'highres') ? 'A high-resolution photo was recovered.' : 'A low-resolution photo was recovered.';
-    if (weatherOccurs && foil === 'yes') {
-        photoStatus += ' System was protected by insulation foil.';
-    }
-    output += `<p><strong>✅ Success!</strong> ${photoStatus}</p>`;
+    output += (camera === 'highres')
+      ? `<p><strong>✅ Success!</strong> A high-resolution photo was recovered.</p>`
+      : `<p><strong>✅ Success!</strong> A low-resolution photo was recovered.</p>`;
   }
 
   document.getElementById('results').innerHTML = output;
