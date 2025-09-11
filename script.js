@@ -36,17 +36,9 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.save();
     ctx.translate(radius, radius);
 
-    // Apply specific rotation offsets based on the spinner name
-    switch (spinnerName) {
-        case 'Power System (Solar Panel)':
-        case 'Power System (Fuel Cell)':
-        case 'Flight Computer (Arduino)':
-        case 'Image Downlink':
-            ctx.rotate(-Math.PI / 2); // 90 degree rotation for 50/50 and 25/75 cases
-            break;
-        case 'Extreme Weather Event':
-            // No rotation needed, a 0 degree offset works for this ratio
-            break;
+    // Apply a specific rotation offset only to the solar panel spinner
+    if (spinnerName === 'Power System (Solar Panel)') {
+      ctx.rotate(-Math.PI / 2); // 90 degree rotation
     }
 
     // Green success zone
