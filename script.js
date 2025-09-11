@@ -2,18 +2,21 @@ document.getElementById('design-form').addEventListener('submit', async function
   e.preventDefault();
 
   const structure = document.querySelector('input[name="structure"]:checked').value;
+  const antenna = document.querySelector('input[name="antenna"]:checked').value; // new
   const computer = document.querySelector('input[name="computer"]:checked').value;
   const camera = document.querySelector('input[name="camera"]:checked').value;
   const power = document.querySelector('input[name="power"]:checked').value;
 
   let mass = 0;
   let volume = 0;
-  let success = { power: true, computer: true };
+  let success = { power: true, computer: true, antenna: true };
 
   // --- Mass and Volume Calculation ---
   // Structures (mass only, no volume impact)
   mass += (structure === 'interlocking') ? 1 : 2;
-  // Interlocking & Screw-type explicitly no volume impact
+
+  // Antenna (mass only, no volume impact)
+  mass += (antenna === 'dipole') ? 1 : 2;
 
   // Flight computer
   if (computer === 'arduino') {
@@ -45,7 +48,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     volume += 1;
   }
 
-  // --- Spinner functions unchanged ---
+  // --- Spinner functions (unchanged) ---
   function drawWheel(successRatio, spinnerName) {
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
@@ -126,15 +129,19 @@ document.getElementById('design-form').addEventListener('submit', async function
     });
   }
 
-  // Power system spinner
+  // --- Spinners ---
   if (power === 'solar') success.power = await spinWheelForOutcome('Power System (Solar Panel)', 0.25);
   else if (power === 'fuelcell') success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
-  else success.power = true; // Battery always passes
+  else success.power = true;
 
-  // Flight computer spinner
   if (success.power) {
     if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
-    else success.computer = true; // Raspberry Pi always passes
+    else success.computer = true;
+  }
+
+  if (success.power && success.computer) {
+    if (antenna === 'helical') success.antenna = await spinWheelForOutcome('Antenna (Helical)', 0.5);
+    else success.antenna = true;
   }
 
   // --- Final mission result ---
@@ -147,6 +154,8 @@ document.getElementById('design-form').addEventListener('submit', async function
     output += `<p><strong>⚡ Power system failed.</strong> No photo taken.</p>`;
   } else if (!success.computer) {
     output += `<p><strong>📷 Computer corrupted data.</strong> A glitched photo was recovered.</p>`;
+  } else if (!success.antenna) {
+    output += `<p><strong>📡 Antenna downlink failed.</strong> No photo received on Earth.</p>`;
   } else {
     output += (camera === 'highres')
       ? `<p><strong>✅ Success!</strong> A high-resolution photo was recovered.</p>`
