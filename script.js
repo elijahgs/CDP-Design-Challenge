@@ -2,27 +2,28 @@ document.getElementById('design-form').addEventListener('submit', async function
   e.preventDefault();
 
   const structure = document.querySelector('input[name="structure"]:checked').value;
-  const antenna = document.querySelector('input[name="antenna"]:checked').value; // new
+  const antenna = document.querySelector('input[name="antenna"]:checked').value;
   const computer = document.querySelector('input[name="computer"]:checked').value;
   const camera = document.querySelector('input[name="camera"]:checked').value;
   const power = document.querySelector('input[name="power"]:checked').value;
+  const foil = document.querySelector('input[name="foil"]:checked').value; // new
 
   let mass = 0;
   let volume = 0;
-  let success = { power: true, computer: true, antenna: true };
+  let success = { power: true, computer: true, antenna: true, weather: true };
 
   // --- Mass and Volume Calculation ---
-  // Structures (mass only, no volume impact)
+  // Structures
   mass += (structure === 'interlocking') ? 1 : 2;
 
-  // Antenna (mass only, no volume impact)
+  // Antenna
   mass += (antenna === 'dipole') ? 1 : 2;
 
   // Flight computer
   if (computer === 'arduino') {
     mass += 1;
     volume += 2;
-  } else { // raspberry
+  } else {
     mass += 2;
     volume += 2;
   }
@@ -31,7 +32,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   if (camera === 'compact') {
     mass += 1;
     volume += 2;
-  } else { // highres
+  } else {
     mass += 2;
     volume += 2;
   }
@@ -43,12 +44,17 @@ document.getElementById('design-form').addEventListener('submit', async function
   } else if (power === 'solar') {
     mass += 2;
     volume += 1;
-  } else { // fuelcell
+  } else {
     mass += 1;
     volume += 1;
   }
 
-  // --- Spinner functions (unchanged) ---
+  // Thermal foil
+  if (foil === 'yes') {
+    mass += 1; // no volume
+  }
+
+  // --- Spinner functions (same as before) ---
   function drawWheel(successRatio, spinnerName) {
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
@@ -66,6 +72,7 @@ document.getElementById('design-form').addEventListener('submit', async function
 
     ctx.translate(-radius, -radius);
 
+    // Green arc
     ctx.beginPath();
     ctx.moveTo(radius, radius);
     ctx.arc(radius, radius, radius, 0, successAngle);
@@ -73,6 +80,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.fillStyle = '#4CAF50';
     ctx.fill();
 
+    // Red arc
     ctx.beginPath();
     ctx.moveTo(radius, radius);
     ctx.arc(radius, radius, radius, successAngle, 2 * Math.PI);
@@ -134,21 +142,19 @@ document.getElementById('design-form').addEventListener('submit', async function
   else if (power === 'fuelcell') success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
   else success.power = true;
 
-  // Flight computer spinner (affects photo quality only)
   if (success.power) {
-    if (computer === 'arduino') {
-      success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
-    } else {
-      success.computer = true; // Raspberry Pi always clean
-    }
+    // Arduino glitch spinner
+    if (computer === 'arduino') success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
+
+    // Antenna spinner
+    if (antenna === 'helical') success.antenna = await spinWheelForOutcome('Antenna (Helical)', 0.5);
   }
 
-  // Antenna spinner (runs as long as power succeeded)
+  // Thermal event spinner (always runs if mission has power)
   if (success.power) {
-    if (antenna === 'helical') {
-      success.antenna = await spinWheelForOutcome('Antenna (Helical)', 0.5);
-    } else {
-      success.antenna = true; // Dipole always passes
+    const weatherOk = await spinWheelForOutcome('Extreme Cold Weather Event', 0.1);
+    if (!weatherOk && foil === 'no') {
+      success.weather = false; // foil would protect, but not selected
     }
   }
 
@@ -160,6 +166,8 @@ document.getElementById('design-form').addEventListener('submit', async function
     output += `<p><strong>🚫 CubeSat too large!</strong> (${volume} volume units > 5)</p>`;
   } else if (!success.power) {
     output += `<p><strong>⚡ Power system failed.</strong> No photo taken.</p>`;
+  } else if (!success.weather) {
+    output += `<p><strong>❄️ Extreme cold event froze the power system.</strong> Mission failed.</p>`;
   } else if (!success.antenna) {
     output += `<p><strong>📡 Antenna downlink failed.</strong> No photo received on Earth.</p>`;
   } else if (!success.computer) {
@@ -171,5 +179,4 @@ document.getElementById('design-form').addEventListener('submit', async function
   }
 
   document.getElementById('results').innerHTML = output;
-
 });
