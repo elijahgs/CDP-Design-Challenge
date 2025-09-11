@@ -66,8 +66,12 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.save();
     ctx.translate(radius, radius);
 
-    if (spinnerName === 'Power System (Solar Panel)' || spinnerName === 'Extreme Cold Weather Event') {
+    if (spinnerName === 'Power System (Solar Panel)') {
       ctx.rotate(-Math.PI / 2);
+    }
+
+    if (spinnerName === 'Extreme Cold Weather Event') {
+      ctx.rotate(-Math.PI / 2 - (Math.PI * 0.05)); // extra 18° offset for 90/10
     }
 
     ctx.translate(-radius, -radius);
