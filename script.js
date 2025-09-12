@@ -71,21 +71,101 @@ document.getElementById('design-form').addEventListener('submit', async function
     return;
   }
 
-  // Helper function to simulate a spinner and update the review
-  async function spinWheelForOutcome(title, successChance) {
-    let result = Math.random() < successChance;
-    let outcomeText = result ? 'Success' : 'Failure';
-    await spinWheel(title, outcomeText);
-    return result;
+  // --- Spinner Functions (reintegrated from your original code) ---
+  function drawWheel(successRatio, spinnerName) {
+    const canvas = document.getElementById('wheel-canvas');
+    const ctx = canvas.getContext('2d');
+    const radius = canvas.width / 2;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const successAngle = 2 * Math.PI * successRatio;
+
+    ctx.save();
+    ctx.translate(radius, radius);
+
+    if (spinnerName === 'Power System (Solar Panel)') {
+      ctx.rotate(-Math.PI / 2);
+    }
+
+    if (spinnerName === 'Extreme Cold Weather Event') {
+      ctx.rotate(-Math.PI / 2 - (Math.PI * 0.3)); // extra offset for 90/10
+    }
+
+    ctx.translate(-radius, -radius);
+
+    // Green arc
+    ctx.beginPath();
+    ctx.moveTo(radius, radius);
+    ctx.arc(radius, radius, radius, 0, successAngle);
+    ctx.closePath();
+    ctx.fillStyle = '#4CAF50';
+    ctx.fill();
+
+    // Red arc
+    ctx.beginPath();
+    ctx.moveTo(radius, radius);
+    ctx.arc(radius, radius, radius, successAngle, 2 * Math.PI);
+    ctx.closePath();
+    ctx.fillStyle = '#F44336';
+    ctx.fill();
+
+    ctx.restore();
   }
+
+  async function spinWheelForOutcome(title, riskChance) {
+    const overlay = document.getElementById('wheel-overlay');
+    const titleEl = document.getElementById('wheel-title');
+    const canvas = document.getElementById('wheel-canvas');
+    const resultLabel = document.getElementById('wheel-result-label');
+
+    resultLabel.textContent = '';
+    titleEl.textContent = title;
+    overlay.style.display = 'flex';
+
+    const successRatio = 1 - riskChance;
+    drawWheel(successRatio, title);
+
+    const isSuccess = Math.random() > riskChance;
+
+    let landingAngleDeg;
+    if (isSuccess) {
+      landingAngleDeg = (360 * successRatio) / 2;
+    } else {
+      landingAngleDeg = 360 * successRatio + (360 * (1 - successRatio)) / 2;
+    }
+
+    const pointerOffset = 90;
+    const finalPointerAngle = (landingAngleDeg + pointerOffset) % 360;
+
+    const fullSpins = Math.floor(Math.random() * 4) + 6;
+    const totalRotation = fullSpins * 360 + finalPointerAngle;
+
+    canvas.style.transition = 'none';
+    canvas.style.transform = `rotate(0deg)`;
+    void canvas.offsetWidth;
+    canvas.style.transition = 'transform 3.5s ease-out';
+    canvas.style.transform = `rotate(${totalRotation}deg)`;
+
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resultLabel.textContent = isSuccess ? '✔️ Success!' : '❌ Failure';
+        resultLabel.style.color = isSuccess ? '#4CAF50' : '#F44336';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+          resolve(isSuccess);
+        }, 1000);
+      }, 3500);
+    });
+  }
+
 
   // --- Run Spinners ---
   // Power spinner
   if (power === 'solar') {
-    success.power = await spinWheelForOutcome('Solar Panel Power System', 0.75);
+    success.power = await spinWheelForOutcome('Power System (Solar Panel)', 0.25);
     review += `<li>Power system: ${success.power ? 'Successful' : 'Failed'}</li>`;
   } else if (power === 'fuelcell') {
-    success.power = await spinWheelForOutcome('Fuel Cell Power System', 0.5);
+    success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
     review += `<li>Power system: ${success.power ? 'Successful' : 'Failed'}</li>`;
   } else { // battery is 100% success
     review += `<li>Power system: Successful</li>`;
@@ -99,7 +179,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   
   // Computer spinner
   if (computer === 'arduino') {
-    success.computer = await spinWheelForOutcome('Arduino Computer', 0.5);
+    success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
     review += `<li>Computer: ${success.computer ? 'Data is not corrupted' : 'Data is corrupted'}</li>`;
   } else if (computer === 'pi') {
     review += `<li>Computer: Data is not corrupted</li>`;
@@ -114,7 +194,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   }
 
   // Thermal event spinner
-  const weatherOccurred = !(await spinWheelForOutcome('Extreme Cold Weather Event', 0.9));
+  const weatherOccurred = !(await spinWheelForOutcome('Extreme Cold Weather Event', 0.1));
   if (weatherOccurred) {
       if (foil === 'no') {
         success.weather = false;
@@ -181,6 +261,3 @@ document.getElementById('design-form').addEventListener('submit', async function
   // Display the final outcome
   document.getElementById('results').innerHTML = `${output}<p>${outcome}</p>`;
 });
-
-// The spinWheel function is assumed to be defined elsewhere in your code, likely in the same file.
-// It is the animation part of the simulation and is not shown here for brevity.
