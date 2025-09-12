@@ -219,19 +219,20 @@ document.getElementById('design-form').addEventListener('submit', async function
     // Templated outcome generation
     let photoStatus = `A **${cameraQuality}** photo was taken`;
     let corruptionStatus = '';
-    let downlinkStatus = '';
     let recoveryStatus = '';
     
     // Check for corruption
     if (computer === 'arduino' && !success.computer) {
-      corruptionStatus = ' but corrupted by the Arduino as it was stored.';
+      corruptionStatus = ' but corrupted by the Arduino during storage.';
     }
 
-    // Check for downlink and recovery
+    // Set recovery status based on antenna type
     if (antenna === 'dipole') {
-      downlinkStatus = ' and stored for recovery.';
       recoveryStatus = ' This photo can be recovered if the system survives the drop test.';
+      // Combine with a simple mission success phrase
+      outcome = `**Mission success!** ${photoStatus}${corruptionStatus}. ${recoveryStatus}`;
     } else { // Helical antenna
+      let downlinkStatus = '';
       if (success.antenna) {
         downlinkStatus = ' and successfully downlinked.';
         if (!success.weather && foil === 'no') {
@@ -239,24 +240,13 @@ document.getElementById('design-form').addEventListener('submit', async function
         } else {
           recoveryStatus = ' An additional copy of the image may be recovered if the system survives the drop test.';
         }
+        outcome = `**Mission success!** ${photoStatus}${corruptionStatus}${downlinkStatus}${recoveryStatus}`;
       } else {
         downlinkStatus = ' but the downlink failed.';
         recoveryStatus = ' A copy of the photo may be recovered if the system survives the drop test.';
+        outcome = `**Partial mission success.** ${photoStatus}${corruptionStatus}${downlinkStatus}${recoveryStatus}`;
       }
     }
-    
-    // Construct the final outcome message
-    let finalOutcome = photoStatus + corruptionStatus;
-    if (antenna === 'helical' && success.antenna) {
-      finalOutcome = '**Mission success!** ' + finalOutcome;
-    } else if (antenna === 'helical' && !success.antenna) {
-      finalOutcome = '**Partial mission success.** ' + finalOutcome;
-    } else {
-      finalOutcome = '**Mission success!** ' + finalOutcome;
-    }
-
-    finalOutcome += downlinkStatus + recoveryStatus;
-    outcome = finalOutcome;
   }
 
   // Display the final outcome
