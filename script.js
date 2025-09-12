@@ -71,7 +71,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     return;
   }
 
-  // --- Spinner Functions (reintegrated from your original code) ---
+  // --- Spinner Functions ---
   function drawWheel(successRatio, spinnerName) {
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
@@ -187,10 +187,11 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   // Antenna spinner
   if (antenna === 'dipole') {
-    review += `<li>Antenna: Downlink successful</li>`;
+    // Dipole is always successful but not a downlink
+    review += `<li>Antenna: Basic connection established</li>`;
   } else if (antenna === 'helical') {
     success.antenna = await spinWheelForOutcome('Helical Antenna', 0.5);
-    review += `<li>Antenna: Downlink ${success.antenna ? 'successful' : 'failed'}</li>`;
+    review += `<li>Antenna: Downlink ${success.antenna ? 'success' : 'failed'}</li>`;
   }
 
   // Thermal event spinner
