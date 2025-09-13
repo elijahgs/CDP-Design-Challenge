@@ -34,7 +34,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   // Camera
   if (camera === 'compact') {
     mass += 1;
-    volume += 2;
+    volume += 1;
   } else {
     mass += 2;
     volume += 2;
@@ -148,7 +148,11 @@ document.getElementById('design-form').addEventListener('submit', async function
 
     return new Promise(resolve => {
       setTimeout(() => {
-        resultLabel.textContent = isSuccess ? '✔️ Success!' : '❌ Failure';
+        if (title === 'Extreme Cold Weather Event') {
+            resultLabel.textContent = isSuccess ? '✔️ No occurence!' : '❌ Occurred!';
+        } else {
+            resultLabel.textContent = isSuccess ? '✔️ Success!' : '❌ Failure!';
+        }
         resultLabel.style.color = isSuccess ? '#4CAF50' : '#F44336';
         setTimeout(() => {
           overlay.style.display = 'none';
@@ -173,16 +177,16 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   // Check for immediate power failure
   if (!success.power) {
-    document.getElementById('results').innerHTML = `<h2>Mission Review</h2><ul>${review}</ul><h2>Mission Outcome</h2><p>The power system failed. The CubeSat did not power up, resulting in a **mission failure**.</p>`;
+    document.getElementById('results').innerHTML = `<h2>Mission Review</h2><ul>${review}</ul><h2>Mission Outcome</h2><p>The power system failed. The CubeSat did not power up, resulting in a <strong>mission failure</strong>.</p>`;
     return;
   }
   
   // Computer spinner
   if (computer === 'arduino') {
     success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
-    review += `<li>Computer: ${success.computer ? 'Data is not corrupted' : 'Data is corrupted'}</li>`;
+    review += `<li>Computer: ${success.computer ? 'Image data sucessfully saved' : 'Image data is partially corrupted'}</li>`;
   } else if (computer === 'pi') {
-    review += `<li>Computer: Data is not corrupted</li>`;
+    review += `<li>Computer: Image data sucessfully saved</li>`;
   }
 
   // Antenna spinner
@@ -217,7 +221,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     outcome = 'The downlink attempt failed, and then the system suffered a critical power failure due to an extreme weather event. The mission has failed.';
   } else {
     // Templated outcome generation
-    let photoStatus = `A **${cameraQuality}** photo was taken`;
+    let photoStatus = `a <strong>${cameraQuality}</strong> photo was taken`;
     let corruptionStatus = '';
     let recoveryStatus = '';
     
@@ -230,7 +234,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     if (antenna === 'dipole') {
       recoveryStatus = ' This photo can be recovered if the system survives the drop test.';
       // Combine with a simple mission success phrase
-      outcome = `**Mission success!** ${photoStatus}${corruptionStatus}. ${recoveryStatus}`;
+      outcome = `<strong>Mission success!</strong> ${photoStatus}${corruptionStatus}. ${recoveryStatus}`;
     } else { // Helical antenna
       let downlinkStatus = '';
       if (success.antenna) {
@@ -240,11 +244,11 @@ document.getElementById('design-form').addEventListener('submit', async function
         } else {
           recoveryStatus = ' An additional copy of the image may be recovered if the system survives the drop test.';
         }
-        outcome = `**Mission success!** ${photoStatus}${corruptionStatus}${downlinkStatus}${recoveryStatus}`;
+        outcome = `<strong>Mission success!</strong> ${photoStatus}${corruptionStatus}${downlinkStatus}. ${recoveryStatus}`;
       } else {
         downlinkStatus = ' but the downlink failed.';
         recoveryStatus = ' A copy of the photo may be recovered if the system survives the drop test.';
-        outcome = `**Partial mission success.** ${photoStatus}${corruptionStatus}${downlinkStatus}${recoveryStatus}`;
+        outcome = `<strong>Partial mission success.</strong> ${photoStatus}${corruptionStatus}${downlinkStatus}. ${recoveryStatus}`;
       }
     }
   }
