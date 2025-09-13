@@ -167,12 +167,12 @@ document.getElementById('design-form').addEventListener('submit', async function
   // Power spinner
   if (power === 'solar') {
     success.power = await spinWheelForOutcome('Power (Solar Panel)', 0.25);
-    review += `<li><strong>Solar Panel Power:</strong> ${success.power ? 'Successful' : 'Failed'}</li>`;
+    review += `<li><strong>Power:</strong> ${success.power ? 'Successful' : 'Failed'}</li>`;
   } else if (power === 'fuelcell') {
     success.power = await spinWheelForOutcome('Power (Fuel Cell)', 0.5);
-    review += `<li><strong>Fuel Cell Power:</strong> ${success.power ? 'Successful' : 'Failed'}</li>`;
+    review += `<li><strong>Power:</strong> ${success.power ? 'Successful' : 'Failed'}</li>`;
   } else { // battery is 100% success
-    review += `<li><strong>Battery Power:</strong> Successful</li>`;
+    review += `<li><strong>Power:</strong> Successful</li>`;
   }
 
   // Check for immediate power failure
@@ -184,9 +184,9 @@ document.getElementById('design-form').addEventListener('submit', async function
   // Computer spinner
   if (computer === 'arduino') {
     success.computer = await spinWheelForOutcome('Avionics (Arduino)', 0.5);
-    review += `<li><strong>Avionics:</strong> ${success.computer ? 'Image data sucessfully saved' : 'Image data is partially corrupted'}</li>`;
+    review += `<li><strong>Avionics:</strong> ${success.computer ? 'Image sucessfully saved' : 'Image partially corrupted'}</li>`;
   } else if (computer === 'pi') {
-    review += `<li><strong>Avionics:</strong> Image data sucessfully saved</li>`;
+    review += `<li><strong>Avionics:</strong> Image sucessfully saved</li>`;
   }
 
   // Antenna spinner
@@ -208,7 +208,7 @@ document.getElementById('design-form').addEventListener('submit', async function
         review += `<li><strong>Weather Event:</strong> Occurred, but system was protected by insulation foil</li>`;
       }
   } else {
-      review += `<li><strong>Weather Event:</strong> Did not occur</li>`;
+      review += `<li><strong>Weather Event:</strong> No occurence</li>`;
   }
   
   // --- Final mission result ---
@@ -240,17 +240,17 @@ document.getElementById('design-form').addEventListener('submit', async function
     } else { // Helical antenna
       let downlinkStatus = '';
       if (success.antenna) {
-        downlinkStatus = ' <strong>The image was successfully downlinked!</strong>';
+        downlinkStatus = '. <strong>The image was then successfully downlinked!</strong>';
         if (!success.weather && foil === 'no') {
           recoveryStatus = ' No data can be recovered from the drop test as the system failed after downlink due to a weather event';
         } else {
           recoveryStatus = ' An additional copy of the image may be recovered if the system survives the drop test';
         }
-        outcome = `${photoStatus}${corruptionStatus}.${downlinkStatus}${recoveryStatus}.`;
+        outcome = `${photoStatus}${corruptionStatus}${downlinkStatus}${recoveryStatus}.`;
       } else {
-        downlinkStatus = ' The image downlink failed';
+        downlinkStatus = ', however the image downlink failed';
         recoveryStatus = ' <strong>The stored image may be recovered if the system survives the drop test</strong>';
-        outcome = `${photoStatus}${corruptionStatus}.${downlinkStatus}.${recoveryStatus}!`;
+        outcome = `${photoStatus}${corruptionStatus}${downlinkStatus}.${recoveryStatus}!`;
       }
     }
   }
