@@ -203,16 +203,17 @@ document.getElementById('design-form').addEventListener('submit', async function
   if (weatherOccurred) {
       if (foil === 'no') {
         success.weather = false;
-        review += `<li><strong>Weather Event:</strong> Occurred, and power system failed</li>`;
+        review += `<li><strong>Weather Event:</strong> Occurred, and power system failed.</li>`;
       } else {
-        review += `<li><strong>Weather Event:</strong> Occurred, but system was protected by insulation foil</li>`;
+        review += `<li><strong>Weather Event:</strong> Occurred, but system was protected by insulation foil.</li>`;
       }
   } else {
-      review += `<li><strong>Weather Event:</strong> No occurence</li>`;
+      review += `<li><strong>Weather Event:</strong> No occurence.</li>`;
   }
   
   // --- Final mission result ---
   let output = `<h2>Simulation Review</h2><ul>${review}</ul><h2>Simulation Outcome</h2>`;
+  let imageToDisplay = '';
 
   // Define outcomes based on the provided logic
   if (!success.weather && antenna === 'dipole') {
@@ -220,6 +221,19 @@ document.getElementById('design-form').addEventListener('submit', async function
   } else if (!success.weather && antenna === 'helical' && !success.antenna) {
     outcome = 'The downlink attempt failed, and then the system suffered a critical power failure due to an extreme weather event. <strong>The mission has failed.</strong>';
   } else {
+    // Determine which image to display based on camera and computer choices
+    if (computer === 'arduino' && !success.computer) {
+        // Corrupted photo
+        imageToDisplay = (camera === 'highres')
+            ? '<img src="Images/High-Res-Glitch.png" alt="Corrupted high-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">'
+            : '<img src="Images/Low-Res-Glitch.png" alt="Corrupted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
+    } else {
+        // Uncorrupted photo
+        imageToDisplay = (camera === 'highres')
+            ? '<img src="Images/High-Res.png" alt="High-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">'
+            : '<img src="Images/Low-Res.png" alt="Low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
+    }
+    
     // Templated outcome generation
     let photoStatus = `A <strong>${cameraQuality}</strong> image was taken`;
     let corruptionStatus = '';
@@ -255,6 +269,6 @@ document.getElementById('design-form').addEventListener('submit', async function
     }
   }
 
-  // Display the final outcome
-  document.getElementById('results').innerHTML = `${output}<p>${outcome}</p>`;
+  // Display the final outcome, including the image
+  document.getElementById('results').innerHTML = `${output}<p>${outcome}</p>${imageToDisplay}`;
 });
