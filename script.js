@@ -208,7 +208,7 @@ document.getElementById('design-form').addEventListener('submit', async function
         review += `<li><strong>Weather Event:</strong> Occurred, but system was protected by insulation foil.</li>`;
       }
   } else {
-      review += `<li><strong>Weather Event:</strong> No occurence.</li>`;
+      review += `<li><strong>Weather Event:</strong> No occurence</li>`;
   }
   
   // --- Final mission result ---
