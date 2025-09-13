@@ -83,7 +83,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.save();
     ctx.translate(radius, radius);
 
-    if (spinnerName === 'Power System (Solar Panel)') {
+    if (spinnerName === 'Power (Solar Panel)') {
       ctx.rotate(-Math.PI / 2);
     }
 
@@ -166,13 +166,13 @@ document.getElementById('design-form').addEventListener('submit', async function
   // --- Run Spinners ---
   // Power spinner
   if (power === 'solar') {
-    success.power = await spinWheelForOutcome('Power System (Solar Panel)', 0.25);
-    review += `<li>Power system: ${success.power ? 'Successful' : 'Failed'}</li>`;
+    success.power = await spinWheelForOutcome('Power (Solar Panel)', 0.25);
+    review += `<li> Solar Panel Power: ${success.power ? 'Successful' : 'Failed'}</li>`;
   } else if (power === 'fuelcell') {
-    success.power = await spinWheelForOutcome('Power System (Fuel Cell)', 0.5);
-    review += `<li>Power system: ${success.power ? 'Successful' : 'Failed'}</li>`;
+    success.power = await spinWheelForOutcome('Power (Fuel Cell)', 0.5);
+    review += `<li>Fuel Cell Power: ${success.power ? 'Successful' : 'Failed'}</li>`;
   } else { // battery is 100% success
-    review += `<li>Power system: Successful</li>`;
+    review += `<li>Battery Power: Successful</li>`;
   }
 
   // Check for immediate power failure
@@ -183,7 +183,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   
   // Computer spinner
   if (computer === 'arduino') {
-    success.computer = await spinWheelForOutcome('Flight Computer (Arduino)', 0.5);
+    success.computer = await spinWheelForOutcome('Avionics (Arduino)', 0.5);
     review += `<li>Computer: ${success.computer ? 'Image data sucessfully saved' : 'Image data is partially corrupted'}</li>`;
   } else if (computer === 'pi') {
     review += `<li>Computer: Image data sucessfully saved</li>`;
@@ -194,7 +194,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     // Dipole is always successful but not a downlink
     review += `<li>Antenna: Basic connection established</li>`;
   } else if (antenna === 'helical') {
-    success.antenna = await spinWheelForOutcome('Helical Antenna', 0.5);
+    success.antenna = await spinWheelForOutcome('Antenna (Helical)', 0.5);
     review += `<li>Antenna: Downlink ${success.antenna ? 'success' : 'failed'}</li>`;
   }
 
@@ -234,7 +234,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     if (antenna === 'dipole') {
       recoveryStatus = ' This photo can be recovered if the system survives the drop test.';
       // Combine with a simple mission success phrase
-      outcome = `<strong>Mission success!</strong> ${photoStatus}${corruptionStatus}. ${recoveryStatus}`;
+      outcome = `<strong>Mission success,</strong> ${photoStatus}${corruptionStatus}. ${recoveryStatus}`;
     } else { // Helical antenna
       let downlinkStatus = '';
       if (success.antenna) {
