@@ -203,12 +203,12 @@ document.getElementById('design-form').addEventListener('submit', async function
   if (weatherOccurred) {
       if (foil === 'no') {
         success.weather = false;
-        review += `<li><strong>Weather Event:</strong> Occurred, and power system failed.</li>`;
+        review += `<li><strong>Cold Weather Event:</strong> Occurred, and power system failed.</li>`;
       } else {
-        review += `<li><strong>Weather Event:</strong> Occurred, but system was protected by insulation foil.</li>`;
+        review += `<li><strong>Cold Weather Event:</strong> Occurred, but system was protected by insulation foil.</li>`;
       }
   } else {
-      review += `<li><strong>Weather Event:</strong> No occurence</li>`;
+      review += `<li><strong>Cold Weather Event:</strong> No occurence</li>`;
   }
   
   // --- Final mission result ---
