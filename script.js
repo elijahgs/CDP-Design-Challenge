@@ -84,11 +84,15 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.translate(radius, radius);
 
     if (spinnerName === 'Power (Solar Panel)') {
-      ctx.rotate(-Math.PI / 2);
+      ctx.rotate(-Math.PI / 2); //  offset for 75/25
     }
 
-    if (spinnerName === 'Extreme Cold Weather Event' || spinnerName === 'Antenna (Dipole)') {
-      ctx.rotate(-Math.PI / 2 - (Math.PI * 0.3)); // extra offset for 90/10
+    if (spinnerName === 'Extreme Cold Weather Event') {
+      ctx.rotate(-Math.PI / 2 - (Math.PI * 0.3)); //  offset for 90/10
+    }
+
+    if (spinnerName === 'Antenna (Dipole)') {
+      ctx.rotate(-Math.PI / 2 - (Math.PI * 0.5)); //  offset for 10/90
     }
 
     ctx.translate(-radius, -radius);
