@@ -87,7 +87,7 @@ document.getElementById('design-form').addEventListener('submit', async function
       ctx.rotate(-Math.PI / 2);
     }
 
-    if (spinnerName === 'Extreme Cold Weather Event') {
+    if (spinnerName === 'Extreme Cold Weather Event' || spinnerName === 'Antenna (Dipole)') {
       ctx.rotate(-Math.PI / 2 - (Math.PI * 0.3)); // extra offset for 90/10
     }
 
@@ -191,8 +191,8 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   // Antenna spinner
   if (antenna === 'dipole') {
-    // Dipole is always successful but not a downlink
-    review += `<li><strong>Antenna:</strong> Basic connection established</li>`;
+    success.antenna = await spinWheelForOutcome('Antenna (Dipole)', 0.1); // 10% downlink chance
+    review += `<li><strong>Antenna:</strong> Downlink ${success.antenna ? 'success' : 'failed'}</li>`;
   } else if (antenna === 'helical') {
     success.antenna = await spinWheelForOutcome('Antenna (Helical)', 0.5);
     review += `<li><strong>Antenna:</strong> Downlink ${success.antenna ? 'success' : 'failed'}</li>`;
@@ -214,61 +214,58 @@ document.getElementById('design-form').addEventListener('submit', async function
   // --- Final mission result ---
   let output = `<h2>Simulation Review</h2><ul>${review}</ul><h2>Simulation Outcome</h2>`;
   let imageToDisplay = '';
-
-  // Define outcomes based on the provided logic
-  if (!success.weather && antenna === 'dipole') {
-    outcome = 'An extreme weather event caused a critical power system failure. <strong>The mission has failed.</strong>';
-  } else if (!success.weather && antenna === 'helical' && !success.antenna) {
-    outcome = 'The downlink attempt failed, and then the system suffered a critical power failure due to an extreme weather event. <strong>The mission has failed.</strong>';
+  let outcomeText = '';
+  
+  // Determine which image to display based on camera and computer choices
+  if (computer === 'arduino' && !success.computer) {
+      imageToDisplay = (camera === 'highres')
+          ? '<img src="Images/High-Res-Glitch.png" alt="Corrupted high-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">'
+          : '<img src="Images/Low-Res-Glitch.png" alt="Corrupted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
   } else {
-    // Determine which image to display based on camera and computer choices
-    if (computer === 'arduino' && !success.computer) {
-        // Corrupted photo
-        imageToDisplay = (camera === 'highres')
-            ? '<img src="Images/High-Res-Glitch.png" alt="Corrupted high-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">'
-            : '<img src="Images/Low-Res-Glitch.png" alt="Corrupted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
-    } else {
-        // Uncorrupted photo
-        imageToDisplay = (camera === 'highres')
-            ? '<img src="Images/High-Res.png" alt="High-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">'
-            : '<img src="Images/Low-Res.png" alt="Low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
-    }
-    
-    // Templated outcome generation
-    let photoStatus = `A <strong>${cameraQuality}</strong> image was taken`;
-    let corruptionStatus = '';
-    let recoveryStatus = '';
-    
-    // Check for corruption
-    if (computer === 'arduino' && !success.computer) {
-      corruptionStatus = ' but corrupted by the Arduino during storage';
-    } else {
-      corruptionStatus = ' and stored safely';
-    }
-
-    // Set recovery status based on antenna type
-    if (antenna === 'dipole') {
-      recoveryStatus = ' <strong>This image can be recovered if the system survives the drop test</strong>';
-      // Combine with a simple mission success phrase
-      outcome = `${photoStatus}${corruptionStatus}.${recoveryStatus}!`;
-    } else { // Helical antenna
-      let downlinkStatus = '';
-      if (success.antenna) {
-        downlinkStatus = '. <strong>The image was then successfully downlinked!</strong>';
-        if (!success.weather && foil === 'no') {
-          recoveryStatus = ' No data can be recovered from the drop test as the system failed after downlink due to a weather event';
-        } else {
-          recoveryStatus = ' An additional copy of the image may be recovered if the system survives the drop test';
-        }
-        outcome = `${photoStatus}${corruptionStatus}${downlinkStatus}${recoveryStatus}.`;
-      } else {
-        downlinkStatus = ', however the image downlink failed';
-        recoveryStatus = ' <strong>The stored image may be recovered if the system survives the drop test</strong>';
-        outcome = `${photoStatus}${corruptionStatus}${downlinkStatus}.${recoveryStatus}!`;
-      }
-    }
+      imageToDisplay = (camera === 'highres')
+          ? '<img src="Images/High-Res.png" alt="High-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">'
+          : '<img src="Images/Low-Res.png" alt="Low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
+  }
+  
+  // Build the outcome message step-by-step
+  let photoStatus = `A <strong>${cameraQuality}</strong> image was taken`;
+  let corruptionStatus = '';
+  let downlinkStatus = '';
+  let recoveryStatus = '';
+  
+  // Check for computer corruption
+  if (computer === 'arduino' && !success.computer) {
+    corruptionStatus = ' but corrupted by the Arduino during storage';
+  } else {
+    corruptionStatus = ' and stored safely';
   }
 
+  // Check for antenna downlink success/failure
+  if (success.antenna) {
+    downlinkStatus = `. The image was successfully downlinked via the ${antenna} antenna!`;
+  } else {
+    downlinkStatus = `, however, the image downlink failed`;
+  }
+  
+  // Check for lander data recovery success/failure
+  if (success.weather || foil === 'yes') {
+    if (!success.antenna) {
+        recoveryStatus = `. The stored image can be recovered <strong>if the system survives the drop test</strong>!`;
+    } else {
+        recoveryStatus = `. An additional copy of the image may be recovered <strong>if the system survives the drop test</strong>.`;
+    }
+  } else {
+    recoveryStatus = `. No data can be recovered from the drop test as the system failed after downlink due to a weather event.`;
+  }
+
+  // Handle the special case where both downlink and drop recovery fail
+  if (!success.antenna && !success.weather && foil === 'no') {
+      outcomeText = `${photoStatus}${corruptionStatus}${downlinkStatus}. An extreme weather event occured and the system failed. <strong>The mission has failed as no data can be recovered!</strong>`;
+  } else {
+      outcomeText = `${photoStatus}${corruptionStatus}${downlinkStatus}${recoveryStatus}`;
+  }
+
+
   // Display the final outcome, including the image
-  document.getElementById('results').innerHTML = `${output}<p>${outcome}</p>${imageToDisplay}`;
+  document.getElementById('results').innerHTML = `${output}<p>${outcomeText}</p>${imageToDisplay}`;
 });
