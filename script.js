@@ -92,7 +92,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     }
 
     if (spinnerName === 'Antenna (Dipole)') {
-      ctx.rotate(-Math.PI / 2 - (Math.PI * 0.5)); //  offset for 10/90
+      ctx.rotate(-Math.PI / 2 - (Math.PI * 0.9)); //  offset for 10/90
     }
 
     ctx.translate(-radius, -radius);
