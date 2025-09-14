@@ -191,7 +191,7 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   // Antenna spinner
   if (antenna === 'dipole') {
-    success.antenna = await spinWheelForOutcome('Antenna (Dipole)', 0.1); // 10% downlink chance
+    success.antenna = await spinWheelForOutcome('Antenna (Dipole)', 0.9); // 10% downlink chance
     review += `<li><strong>Antenna:</strong> Downlink ${success.antenna ? 'success' : 'failed'}</li>`;
   } else if (antenna === 'helical') {
     success.antenna = await spinWheelForOutcome('Antenna (Helical)', 0.5);
@@ -244,7 +244,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   if (success.antenna) {
     downlinkStatus = `. The image was successfully downlinked via the ${antenna} antenna!`;
   } else {
-    downlinkStatus = `, however, the image downlink failed`;
+    downlinkStatus = `, however, the image downlink failed.`;
   }
   
   // Check for lander data recovery success/failure
@@ -260,7 +260,7 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   // Handle the special case where both downlink and drop recovery fail
   if (!success.antenna && !success.weather && foil === 'no') {
-      outcomeText = `${photoStatus}${corruptionStatus}${downlinkStatus}. An extreme weather event occured and the system failed. <strong>The mission has failed as no data can be recovered!</strong>`;
+      outcomeText = `${photoStatus}${corruptionStatus}${downlinkStatus} An extreme weather event occured and the system failed. <strong>The mission has failed as no data can be recovered!</strong>`;
   } else {
       outcomeText = `${photoStatus}${corruptionStatus}${downlinkStatus}${recoveryStatus}`;
   }
