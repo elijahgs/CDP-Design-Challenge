@@ -256,12 +256,12 @@ document.getElementById('design-form').addEventListener('submit', async function
   // Check for lander data recovery success/failure
   if (success.weather || foil === 'yes') {
     if (!success.antenna) {
-        recoveryStatus = `. The stored image can be recovered <strong>if the system survives the drop test</strong>!`;
+        recoveryStatus = ` The stored image can be recovered <strong>if the system survives the drop test</strong>!`;
     } else {
-        recoveryStatus = `. An additional copy of the image may be recovered <strong>if the system survives the drop test</strong>.`;
+        recoveryStatus = ` An additional copy of the image may be recovered <strong>if the system survives the drop test</strong>.`;
     }
   } else {
-    recoveryStatus = `. No data can be recovered from the drop test as the system failed after downlink due to a weather event.`;
+    recoveryStatus = ` No data can be recovered from the drop test as the system failed after downlink due to a weather event.`;
   }
 
   // Handle the special case where both downlink and drop recovery fail
