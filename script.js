@@ -83,7 +83,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.save();
     ctx.translate(radius, radius);
 
-    if (spinnerName === 'Power (Solar Panel)') {
+    if (spinnerName === 'Power-Up Attempt (Solar Panel)') {
       ctx.rotate(-Math.PI / 2); //  offset for 75/25
     }
 
@@ -91,7 +91,7 @@ document.getElementById('design-form').addEventListener('submit', async function
       ctx.rotate(-Math.PI / 2 - (Math.PI * 0.3)); //  offset for 90/10
     }
 
-    if (spinnerName === 'Antenna (Dipole)') {
+    if (spinnerName === 'Downlink Attempt (Dipole)') {
       ctx.rotate(-Math.PI / 2 - (Math.PI * .7)); //  offset for 10/90
     }
 
@@ -154,6 +154,8 @@ document.getElementById('design-form').addEventListener('submit', async function
       setTimeout(() => {
         if (title === 'Extreme Cold Weather Event') {
             resultLabel.textContent = isSuccess ? '✔️ No occurence!' : '❌ Occurred!';
+        } else if (title === 'Image Storage (Arduino)') {
+            resultLabel.textContent = isSuccess ? '✔️ Success!' : '❌ Image Corrupted!';
         } else {
             resultLabel.textContent = isSuccess ? '✔️ Success!' : '❌ Failure!';
         }
@@ -170,10 +172,10 @@ document.getElementById('design-form').addEventListener('submit', async function
   // --- Run Spinners ---
   // Power spinner
   if (power === 'solar') {
-    success.power = await spinWheelForOutcome('Power (Solar Panel)', 0.25);
+    success.power = await spinWheelForOutcome('Power-Up Attempt (Solar Panel)', 0.25);
     review += `<li><strong>Power:</strong> ${success.power ? 'Successful' : 'Failed'}</li>`;
   } else if (power === 'fuelcell') {
-    success.power = await spinWheelForOutcome('Power (Fuel Cell)', 0.5);
+    success.power = await spinWheelForOutcome('Power-Up Attempt (Fuel Cell)', 0.5);
     review += `<li><strong>Power:</strong> ${success.power ? 'Successful' : 'Failed'}</li>`;
   } else { // battery is 100% success
     review += `<li><strong>Power:</strong> Successful</li>`;
@@ -187,7 +189,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   
   // Computer spinner
   if (computer === 'arduino') {
-    success.computer = await spinWheelForOutcome('Avionics (Arduino)', 0.5);
+    success.computer = await spinWheelForOutcome('Image Storage (Arduino)', 0.5);
     review += `<li><strong>Avionics:</strong> ${success.computer ? 'Image sucessfully saved' : 'Image partially corrupted'}</li>`;
   } else if (computer === 'pi') {
     review += `<li><strong>Avionics:</strong> Image sucessfully saved</li>`;
@@ -195,10 +197,10 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   // Antenna spinner
   if (antenna === 'dipole') {
-    success.antenna = await spinWheelForOutcome('Antenna (Dipole)', 0.9); // 10% downlink chance
+    success.antenna = await spinWheelForOutcome('Downlink Attempt (Dipole)', 0.9); // 10% downlink chance
     review += `<li><strong>Antenna:</strong> Downlink ${success.antenna ? 'success' : 'failed'}</li>`;
   } else if (antenna === 'helical') {
-    success.antenna = await spinWheelForOutcome('Antenna (Helical)', 0.5);
+    success.antenna = await spinWheelForOutcome('Downlink Attempt (Helical)', 0.5);
     review += `<li><strong>Antenna:</strong> Downlink ${success.antenna ? 'success' : 'failed'}</li>`;
   }
 
