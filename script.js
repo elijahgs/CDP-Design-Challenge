@@ -87,7 +87,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   // Display the first GIF
   displayGif('Launch.gif');
   await new Promise(r => setTimeout(r, 3000));
-  ();
+  clearGif();
    
   return;
   }
