@@ -17,7 +17,7 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   // Display the first GIF
   displayGif('Launch.gif');
-  await new Promise(r => setTimeout(r, 2500));
+  await new Promise(r => setTimeout(r, 3000));
 
   const structure = document.querySelector('input[name="structure"]:checked').value;
   const antenna = document.querySelector('input[name="antenna"]:checked').value;
@@ -209,7 +209,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   
   // Display the second GIF after successful power up
   displayGif('Power-Up.gif');
-  await new Promise(r => setTimeout(r, 2000));
+  await new Promise(r => setTimeout(r, 3500));
 
   // Computer spinner
   if (computer === 'arduino') {
@@ -231,7 +231,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   // Display the third GIF
   clearGif();
   displayGif('Image.gif');
-  await new Promise(r => setTimeout(r, 2000));
+  await new Promise(r => setTimeout(r, 4500));
 
   // Thermal event spinner
   const weatherOccurred = !(await spinWheelForOutcome('Extreme Cold Weather Event', 0.1));
@@ -249,7 +249,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   // Display the fourth GIF
   clearGif();
   displayGif('Weather.gif');
-  await new Promise(r => setTimeout(r, 2000));
+  await new Promise(r => setTimeout(r, 3500));
   
   // --- Final mission result ---
   clearGif();
