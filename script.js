@@ -88,7 +88,7 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   // Display the first GIF at the start of the simulation
   displayGif('Launch.gif');
-  await new Promise(r => setTimeout(r, 3000));
+  await new Promise(r => setTimeout(r, 3500));
   clearGif();
 
   // --- Spinner Functions ---
@@ -208,7 +208,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   
   // Display the second GIF after successful power up
   displayGif('Power-Up.gif');
-  await new Promise(r => setTimeout(r, 3500));
+  await new Promise(r => setTimeout(r, 4000));
   clearGif();
 
   // Computer spinner
@@ -230,7 +230,7 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   // Display the third GIF
   displayGif('Image.gif');
-  await new Promise(r => setTimeout(r, 4500));
+  await new Promise(r => setTimeout(r, 6500));
   clearGif();
 
   // Thermal event spinner
