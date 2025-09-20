@@ -230,7 +230,7 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   // Display the third GIF
   displayGif('Image.gif');
-  await new Promise(r => setTimeout(r, 6500));
+  await new Promise(r => setTimeout(r, 7500));
   clearGif();
 
   // Thermal event spinner
