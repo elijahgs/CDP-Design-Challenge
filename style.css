@@ -119,7 +119,7 @@ margin-top: 20px;
 }
 
 #gif-container {
-  max-width: 90vw; /* Change this to control the size */
+  max-width: 80vw; /* Change this to control the size */
 }
 
 #gif-container img {
