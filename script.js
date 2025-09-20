@@ -81,16 +81,15 @@ document.getElementById('design-form').addEventListener('submit', async function
     if (volume > 5) {
       output += `<p>Volume: ${volume} units</p>`;
     }
-    
-  document.getElementById('results').innerHTML = output;
-    
-  // Display the first GIF
+
+    document.getElementById('results').innerHTML = output;
+    return;
+  }
+
+  // Display the first GIF at the start of the simulation
   displayGif('Launch.gif');
   await new Promise(r => setTimeout(r, 3000));
   clearGif();
-   
-  return;
-  }
 
   // --- Spinner Functions ---
   function drawWheel(successRatio, spinnerName) {
