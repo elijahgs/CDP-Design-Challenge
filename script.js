@@ -15,10 +15,6 @@ document.getElementById('design-form').addEventListener('submit', async function
     gifOverlay.style.display = 'none'; // Hide the overlay
   }
 
-  // Display the first GIF
-  displayGif('Launch.gif');
-  await new Promise(r => setTimeout(r, 3000));
-
   const structure = document.querySelector('input[name="structure"]:checked').value;
   const antenna = document.querySelector('input[name="antenna"]:checked').value;
   const computer = document.querySelector('input[name="computer"]:checked').value;
@@ -85,9 +81,15 @@ document.getElementById('design-form').addEventListener('submit', async function
     if (volume > 5) {
       output += `<p>Volume: ${volume} units</p>`;
     }
-    document.getElementById('results').innerHTML = output;
-    clearGif();
-    return;
+    
+  document.getElementById('results').innerHTML = output;
+    
+  // Display the first GIF
+  displayGif('Launch.gif');
+  await new Promise(r => setTimeout(r, 3000));
+  ();
+   
+  return;
   }
 
   // --- Spinner Functions ---
@@ -187,10 +189,8 @@ document.getElementById('design-form').addEventListener('submit', async function
     });
   }
 
-
   // --- Run Spinners ---
   // Power spinner
-  clearGif();
   if (power === 'solar') {
     success.power = await spinWheelForOutcome('Power-Up Attempt (Solar Panel)', 0.25);
     review += `<li><strong>Power:</strong> ${success.power ? 'Successful' : 'Failed'}</li>`;
@@ -210,6 +210,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   // Display the second GIF after successful power up
   displayGif('Power-Up.gif');
   await new Promise(r => setTimeout(r, 3500));
+  clearGif();
 
   // Computer spinner
   if (computer === 'arduino') {
@@ -229,9 +230,9 @@ document.getElementById('design-form').addEventListener('submit', async function
   }
 
   // Display the third GIF
-  clearGif();
   displayGif('Image.gif');
   await new Promise(r => setTimeout(r, 4500));
+  clearGif();
 
   // Thermal event spinner
   const weatherOccurred = !(await spinWheelForOutcome('Extreme Cold Weather Event', 0.1));
@@ -247,12 +248,11 @@ document.getElementById('design-form').addEventListener('submit', async function
   }
 
   // Display the fourth GIF
-  clearGif();
   displayGif('Weather.gif');
   await new Promise(r => setTimeout(r, 3500));
+  clearGif();
   
   // --- Final mission result ---
-  clearGif();
   let output = `<h2>Simulation Review</h2><ul>${review}</ul><h2>Simulation Outcome</h2>`;
   let imageToDisplay = '';
   let outcomeText = '';
