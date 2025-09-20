@@ -1,6 +1,19 @@
 document.getElementById('design-form').addEventListener('submit', async function (e) {
   e.preventDefault();
 
+  function displayGif(gifFileName) {
+    const gifContainer = document.getElementById('gif-container');
+    gifContainer.innerHTML = `<img src="Gifs/${gifFileName}" alt="Mission animation" />`;
+  }
+
+  function clearGif() {
+    document.getElementById('gif-container').innerHTML = '';
+  }
+
+  // Display the first GIF
+  displayGif('Launch.gif');
+  await new Promise(r => setTimeout(r, 2500));
+
   const structure = document.querySelector('input[name="structure"]:checked').value;
   const antenna = document.querySelector('input[name="antenna"]:checked').value;
   const computer = document.querySelector('input[name="computer"]:checked').value;
@@ -68,6 +81,7 @@ document.getElementById('design-form').addEventListener('submit', async function
       output += `<p>Volume: ${volume} units</p>`;
     }
     document.getElementById('results').innerHTML = output;
+    clearGif();
     return;
   }
 
@@ -84,15 +98,15 @@ document.getElementById('design-form').addEventListener('submit', async function
     ctx.translate(radius, radius);
 
     if (spinnerName === 'Power-Up Attempt (Solar Panel)') {
-      ctx.rotate(-Math.PI / 2); //  offset for 75/25
+      ctx.rotate(-Math.PI / 2);
     }
 
     if (spinnerName === 'Extreme Cold Weather Event') {
-      ctx.rotate(-Math.PI / 2 - (Math.PI * 0.3)); //  offset for 90/10
+      ctx.rotate(-Math.PI / 2 - (Math.PI * 0.3));
     }
 
     if (spinnerName === 'Downlink Attempt (Dipole)') {
-      ctx.rotate(-Math.PI / 2 - (Math.PI * .7)); //  offset for 10/90
+      ctx.rotate(-Math.PI / 2 - (Math.PI * .7));
     }
 
     ctx.translate(-radius, -radius);
@@ -171,6 +185,7 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   // --- Run Spinners ---
   // Power spinner
+  clearGif();
   if (power === 'solar') {
     success.power = await spinWheelForOutcome('Power-Up Attempt (Solar Panel)', 0.25);
     review += `<li><strong>Power:</strong> ${success.power ? 'Successful' : 'Failed'}</li>`;
@@ -187,6 +202,10 @@ document.getElementById('design-form').addEventListener('submit', async function
     return;
   }
   
+  // Display the second GIF after successful power up
+  displayGif('Power-Up.gif');
+  await new Promise(r => setTimeout(r, 2500));
+
   // Computer spinner
   if (computer === 'arduino') {
     success.computer = await spinWheelForOutcome('Image Storage (Arduino)', 0.5);
@@ -204,6 +223,11 @@ document.getElementById('design-form').addEventListener('submit', async function
     review += `<li><strong>Antenna:</strong> Downlink ${success.antenna ? 'success' : 'failed'}</li>`;
   }
 
+  // Display the third GIF
+  clearGif();
+  displayGif('Image.gif');
+  await new Promise(r => setTimeout(r, 3500));
+
   // Thermal event spinner
   const weatherOccurred = !(await spinWheelForOutcome('Extreme Cold Weather Event', 0.1));
   if (weatherOccurred) {
@@ -216,8 +240,14 @@ document.getElementById('design-form').addEventListener('submit', async function
   } else {
       review += `<li><strong>Cold Weather Event:</strong> No occurence</li>`;
   }
+
+  // Display the fourth GIF
+  clearGif();
+  displayGif('Weather.gif');
+  await new Promise(r => setTimeout(r, 2500));
   
   // --- Final mission result ---
+  clearGif();
   let output = `<h2>Simulation Review</h2><ul>${review}</ul><h2>Simulation Outcome</h2>`;
   let imageToDisplay = '';
   let outcomeText = '';
