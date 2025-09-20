@@ -3,11 +3,16 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   function displayGif(gifFileName) {
     const gifContainer = document.getElementById('gif-container');
-    gifContainer.innerHTML = `<img src="Gifs/${gifFileName}" alt="Mission animation" />`;
+    const gifOverlay = document.getElementById('gif-overlay');
+    gifContainer.innerHTML = `<img src="gifs/${gifFileName}" alt="Mission animation" />`;
+    gifOverlay.style.display = 'flex'; // Show the overlay
   }
 
   function clearGif() {
-    document.getElementById('gif-container').innerHTML = '';
+    const gifContainer = document.getElementById('gif-container');
+    const gifOverlay = document.getElementById('gif-overlay');
+    gifContainer.innerHTML = '';
+    gifOverlay.style.display = 'none'; // Hide the overlay
   }
 
   // Display the first GIF
@@ -204,7 +209,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   
   // Display the second GIF after successful power up
   displayGif('Power-Up.gif');
-  await new Promise(r => setTimeout(r, 2500));
+  await new Promise(r => setTimeout(r, 2000));
 
   // Computer spinner
   if (computer === 'arduino') {
@@ -226,7 +231,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   // Display the third GIF
   clearGif();
   displayGif('Image.gif');
-  await new Promise(r => setTimeout(r, 3500));
+  await new Promise(r => setTimeout(r, 2000));
 
   // Thermal event spinner
   const weatherOccurred = !(await spinWheelForOutcome('Extreme Cold Weather Event', 0.1));
@@ -244,7 +249,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   // Display the fourth GIF
   clearGif();
   displayGif('Weather.gif');
-  await new Promise(r => setTimeout(r, 2500));
+  await new Promise(r => setTimeout(r, 2000));
   
   // --- Final mission result ---
   clearGif();
