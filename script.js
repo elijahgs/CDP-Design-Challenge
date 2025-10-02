@@ -177,7 +177,7 @@ document.getElementById('design-form').addEventListener('submit', async function
             resultLabel.textContent = isSuccess ? '✔️ No occurence!' : '❄️ Occurred!';
         } else if (title === 'Image Storage (Arduino)') {
             resultLabel.textContent = isSuccess ? '✔️ Success!' : '⚠️ Image Corrupted!';
-        } else if (title === 'Image Distortion (Low-Res Camera)') { // NEW: Distortion text
+        } else if (title === 'Image Capture (Low-Res Camera)') { // NEW: Distortion text
             resultLabel.textContent = isSuccess ? '✔️ No Distortion!' : '⚠️ Image Distorted!';
         } else {
             resultLabel.textContent = isSuccess ? '✔️ Success!' : '❌ Failure!';
@@ -216,7 +216,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   // --- Run Spinners (Camera, Avionics, & Antenna) ---
   // Camera spinner
   if (camera === 'lowres') {
-    success.distortion = await spinWheelForOutcome('Image Distortion (Low-Res Camera)', 0.5); // 50% chance of distortion
+    success.distortion = await spinWheelForOutcome('Image Capture (Low-Res Camera)', 0.5); // 50% chance of distortion
     review += `<li><strong>Low-Res Camera:</strong> Image captured ${success.distortion ? 'successfully' : 'with distortion'}.</li>`;
   } else {
     review += `<li><strong>High-Res Camera:</strong> Image captured with distortion.</li>`;
