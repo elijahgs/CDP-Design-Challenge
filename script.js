@@ -298,7 +298,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   }
   
   // --- Final Outcome Text Logic ---
-  let photoStatus = `A <strong>${cameraQuality}</strong> image was taken!`;
+  let photoStatus = `A <strong>${cameraQuality}</strong> image was taken`;
   let corruptionStatus = '';
   let downlinkStatus = '';
   let recoveryStatus = '';
@@ -308,23 +308,23 @@ document.getElementById('design-form').addEventListener('submit', async function
 
   if (arduinoFailed && lowresDistorted) {
       // Both issues occurred
-      corruptionStatus = ' However, the image was distorted by the low-res optics during capture and partially corrupted by the Arduino during storage.';
+      corruptionStatus = ', however, the image was distorted by the low-res optics during capture and partially corrupted by the Arduino during storage.';
   } else if (arduinoFailed) {
       // Arduino corruption only (affects Low-Res or High-Res)
-      corruptionStatus = ' However, the image was corrupted by the Arduino during storage.';
+      corruptionStatus = ', however, the image was corrupted by the Arduino during storage.';
   } else if (lowresDistorted) {
       // Distortion only (Low-Res only)
-      corruptionStatus = ' However, the image was distorted during capture by the low-res camera.';
+      corruptionStatus = ', however, the image was distorted during capture by the low-res camera.';
   } else {
       // No issues
-      corruptionStatus = ' The image was stored safely!';
+      corruptionStatus = ' and the image was stored safely!';
   }
 
   // Check for antenna downlink success/failure
   if (success.antenna) {
-    downlinkStatus = `Then, the image was <strong>successfully downlinked</strong> via the ${antenna} antenna!`;
+    downlinkStatus = ` Then, the image was <strong>successfully downlinked</strong> via the ${antenna} antenna!`;
   } else {
-    downlinkStatus = `Then, the image downlink failed.`;
+    downlinkStatus = ` Then, the image downlink failed.`;
   }
   
   // Check for lander data recovery success/failure
