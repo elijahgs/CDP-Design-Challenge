@@ -30,7 +30,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   let review = '';
   const cameraQuality = (camera === 'highres') ? 'high-resolution' : 'low-resolution';
 
-  // --- Mass and Volume Calculation (omitted for brevity) ---
+  // --- Mass and Volume Calculation ---
   // Structures
   mass += (structure === 'interlocking') ? 1 : 2;
 
@@ -92,7 +92,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   await new Promise(r => setTimeout(r, 3500));
   clearGif();
 
-  // --- Spinner Functions (omitted drawWheel for brevity) ---
+  // --- Spinner Functions ---
   function drawWheel(successRatio, spinnerName) {
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
@@ -115,6 +115,8 @@ document.getElementById('design-form').addEventListener('submit', async function
     if (spinnerName === 'Downlink Attempt (Dipole)') {
       ctx.rotate(-Math.PI / 2 - (Math.PI * .7));
     }
+
+    // NOTE: No rotation is needed for 50/50 (0.5) spinners like Fuel Cell and Image Distortion
 
     ctx.translate(-radius, -radius);
 
@@ -173,11 +175,12 @@ document.getElementById('design-form').addEventListener('submit', async function
 
     return new Promise(resolve => {
       setTimeout(() => {
+        // UPDATED: Using new failure icons
         if (title === 'Extreme Cold Weather Event') {
             resultLabel.textContent = isSuccess ? '✔️ No occurence!' : '❄️ Occurred!';
         } else if (title === 'Image Storage (Arduino)') {
             resultLabel.textContent = isSuccess ? '✔️ Success!' : '⚠️ Image Corrupted!';
-        } else if (title === 'Image Capture (Low-Res Camera)') { // NEW: Distortion text
+        } else if (title === 'Image Capture (Low-Res Camera)') {
             resultLabel.textContent = isSuccess ? '✔️ No Distortion!' : '⚠️ Image Distorted!';
         } else {
             resultLabel.textContent = isSuccess ? '✔️ Success!' : '❌ Failure!';
@@ -214,15 +217,16 @@ document.getElementById('design-form').addEventListener('submit', async function
   clearGif();
 
   // --- Run Spinners (Camera, Avionics, & Antenna) ---
-  // Camera spinner
-  if (camera === 'lowres') {
-    success.distortion = await spinWheelForOutcome('Image Capture (Low-Res Camera)', 0.5); // 50% chance of distortion
+
+  // NEW POSITION: Camera Distortion Spinner (runs first after power-up)
+  if (camera === 'lowres') {
+    success.distortion = await spinWheelForOutcome('Image Capture (Low-Res Camera)', 0.5); 
     review += `<li><strong>Low-Res Camera:</strong> Image captured ${success.distortion ? 'successfully' : 'with distortion'}.</li>`;
   } else {
-    review += `<li><strong>High-Res Camera:</strong> Image captured with distortion.</li>`;
+    review += `<li><strong>High-Res Camera:</strong> Image taken without distortion.</li>`;
   }
-  
-  // Avionics spinner
+  
+  // Avionics spinner
   if (computer === 'arduino') {
     success.computer = await spinWheelForOutcome('Image Storage (Arduino)', 0.5);
     review += `<li><strong>Avionics:</strong> ${success.computer ? 'Image sucessfully saved' : 'Image partially corrupted'}</li>`;
@@ -249,13 +253,12 @@ document.getElementById('design-form').addEventListener('submit', async function
   const weatherOccurred = !(await spinWheelForOutcome('Extreme Cold Weather Event', 0.1));
   if (weatherOccurred) {
       if (foil === 'no') {
-        success.weather = false;
-         += `<li><strong>Cold Weather Event:</strong> Occurred, and power system failed.</li>`;
+        review += `<li><strong>Cold Weather Event:</strong> Occurred, and power system failed.</li>`; // CORRECTED: review +=
       } else {
-         += `<li><strong>Cold Weather Event:</strong> Occurred, but system was protected by insulation foil!</li>`;
+        review += `<li><strong>Cold Weather Event:</strong> Occurred, but system was protected by insulation foil!</li>`; // CORRECTED: review +=
       }
   } else {
-       += `<li><strong>Cold Weather Event:</strong> No occurence</li>`;
+      review += `<li><strong>Cold Weather Event:</strong> No occurence</li>`; // CORRECTED: review +=
   }
 
   // Display the fourth GIF
@@ -269,22 +272,22 @@ document.getElementById('design-form').addEventListener('submit', async function
   let outcomeText = '';
   
   // --- Final Image Selection Logic ---
-  
+  
   const isGlitched = !success.computer;
-  
+  
   if (camera === 'highres') {
       imageToDisplay = (isGlitched)
           ? '<img src="Images/High-Res-Glitch.png" alt="Corrupted high-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">'
           : '<img src="Images/High-Res.png" alt="High-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
   } else { // camera === 'lowres'
       const isDistorted = !success.distortion;
-      
+      
       if (isDistorted && isGlitched) {
           // Both Distortion and Glitch
-          imageToDisplay = '<img src="Images/Low-Res-Glitch-Distorted.png" alt="Distorted and corrupted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
+          imageToDisplay = '<img src="Images/Low-Res-Distortion-Glitch.png" alt="Distorted and corrupted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
       } else if (isDistorted) {
           // Distortion Only
-          imageToDisplay = '<img src="Images/Low-Res-Distorted.png" alt="Distorted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
+          imageToDisplay = '<img src="Images/Low-Res-Distortion.png" alt="Distorted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
       } else if (isGlitched) {
           // Glitch Only
           imageToDisplay = '<img src="Images/Low-Res-Glitch.png" alt="Corrupted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
