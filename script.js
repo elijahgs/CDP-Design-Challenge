@@ -46,7 +46,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   }
 
   // Camera
-  if (camera === 'compact') {
+  if (camera === 'lowres') {
     mass += 1;
     volume += 1;
   } else {
