@@ -1,4 +1,4 @@
-cdocument.getElementById('design-form').addEventListener('submit', async function (e) {
+document.getElementById('design-form').addEventListener('submit', async function (e) {
   e.preventDefault();
 
   function displayGif(gifFileName) {
@@ -27,7 +27,7 @@ cdocument.getElementById('design-form').addEventListener('submit', async functio
   let success = { power: true, computer: true, antenna: true, weather: true };
   let outcome = '';
   let review = '';
-  const cameraQuality = (camera === 'highres') ? 'high-resolution' : 'low-cost';
+  const cameraQuality = (camera === 'highres') ? 'high-resolution' : 'low-resolution';
 
   // --- Mass and Volume Calculation ---
   // Structures
@@ -46,7 +46,7 @@ cdocument.getElementById('design-form').addEventListener('submit', async functio
   }
 
   // Camera
-  if (camera === 'lowcost') {
+  if (camera === 'compact') {
     mass += 1;
     volume += 1;
   } else {
@@ -260,11 +260,11 @@ cdocument.getElementById('design-form').addEventListener('submit', async functio
   if (computer === 'arduino' && !success.computer) {
       imageToDisplay = (camera === 'highres')
           ? '<img src="Images/High-Res-Glitch.png" alt="Corrupted high-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">'
-          : '<img src="Images/Low-Res-Glitch.png" alt="Corrupted low-cost photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
+          : '<img src="Images/Low-Res-Glitch.png" alt="Corrupted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
   } else {
       imageToDisplay = (camera === 'highres')
           ? '<img src="Images/High-Res.png" alt="High-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">'
-          : '<img src="Images/Low-Res.png" alt="Low-cost photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
+          : '<img src="Images/Low-Res.png" alt="Low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
   }
   
   // Build the outcome message step-by-step
