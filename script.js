@@ -284,10 +284,10 @@ document.getElementById('design-form').addEventListener('submit', async function
       
       if (isDistorted && isGlitched) {
           // Both Distortion and Glitch
-          imageToDisplay = '<img src="Images/Low-Res-Distortion-Glitch.png" alt="Distorted and corrupted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
+          imageToDisplay = '<img src="Images/Low-Res-Glitch-Distorted.png" alt="Distorted and corrupted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
       } else if (isDistorted) {
           // Distortion Only
-          imageToDisplay = '<img src="Images/Low-Res-Distortion.png" alt="Distorted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
+          imageToDisplay = '<img src="Images/Low-Res-Distorted.png" alt="Distorted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
       } else if (isGlitched) {
           // Glitch Only
           imageToDisplay = '<img src="Images/Low-Res-Glitch.png" alt="Corrupted low-resolution photo from the CubeSat" style="max-width:100%; height:auto; margin-top: 15px;">';
