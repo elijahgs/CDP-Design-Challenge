@@ -1,10 +1,28 @@
 document.getElementById('design-form').addEventListener('submit', async function (e) {
   e.preventDefault();
 
-  function displayGif(gifFileName) {
+/*  function displayGif(gifFileName) {
     const gifContainer = document.getElementById('gif-container');
     const gifOverlay = document.getElementById('gif-overlay');
     gifContainer.innerHTML = `<img src="gifs/${gifFileName}" alt="Mission animation" />`;
+    gifOverlay.style.display = 'flex'; // Show the overlay
+  } */
+
+  function displayGif(gifFileName) {
+    const gifContainer = document.getElementById('gif-container');
+    const gifOverlay = document.getElementById('gif-overlay');
+    
+    // Create the image element
+    const imgElement = document.createElement('img');
+    imgElement.src = `gifs/${gifFileName}`;
+    imgElement.alt = "Mission animation";
+    
+    // The key to restarting the GIF:
+    // 1. Clear the container/old image.
+    gifContainer.innerHTML = '';
+    // 2. Append the new image element.
+    gifContainer.appendChild(imgElement);
+    
     gifOverlay.style.display = 'flex'; // Show the overlay
   }
 
@@ -208,7 +226,6 @@ document.getElementById('design-form').addEventListener('submit', async function
   // Check for immediate power failure
   if (!success.power) {
     document.getElementById('results').innerHTML = `<h2>Mission Review</h2><ul>${review}</ul><h2>Mission Outcome</h2><p>The power system failed. The CubeSat did not power up, resulting in a <strong>mission failure</strong>.</p>`;
-    clearGif();
     return;
   }
   
