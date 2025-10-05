@@ -208,7 +208,8 @@ document.getElementById('design-form').addEventListener('submit', async function
   // Check for immediate power failure
   if (!success.power) {
     document.getElementById('results').innerHTML = `<h2>Mission Review</h2><ul>${review}</ul><h2>Mission Outcome</h2><p>The power system failed. The CubeSat did not power up, resulting in a <strong>mission failure</strong>.</p>`;
-    return;
+    clearGif();
+    return;
   }
   
   // Display the second GIF after successful power up
