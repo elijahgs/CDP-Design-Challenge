@@ -222,7 +222,7 @@ document.getElementById('design-form').addEventListener('submit', async function
   // NEW POSITION: Camera Distortion Spinner (runs first after power-up)
   if (camera === 'lowres') {
     success.distortion = await spinWheelForOutcome('Image Capture (Low-Res Camera)', 0.5); 
-    review += `<li><strong>Low-Res Camera:</strong> Image captured ${success.distortion ? 'successfully' : 'with distortion'}.</li>`;
+    review += `<li><strong>Low-Res Camera:</strong> Image captured ${success.distortion ? 'successfully' : 'with distortion'}</li>`;
   } else {
     review += `<li><strong>High-Res Camera:</strong> Image captured without distortion</li>`;
   }
