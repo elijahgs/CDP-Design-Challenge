@@ -14,7 +14,7 @@ document.getElementById('design-form').addEventListener('submit', async function
     
     // Create the image element
     const imgElement = document.createElement('img');
-    imgElement.src = `gifs/${gifFileName}`;
+    imgElement.src = `gifs/${gifFileName}?t=${Date.now()}`;
     imgElement.alt = "Mission animation";
     
     // The key to restarting the GIF:
